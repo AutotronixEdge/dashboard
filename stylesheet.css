@@ -24,8 +24,38 @@ body {
     height: 100vh;
     padding: var(--spacing);
     user-select: none;
+    display: grid;
+
+    grid-template-columns: 50% 50%;
+    grid-template-rows: 35% 35% 30%;
+
+    grid-template-areas:
+        "graphs1 track"
+        "graphs2 track"
+        "table track";
 }
 
-input, textarea, button {
+.myGraph2 {
+    grid-area: graphs1;
+}
+
+.myGraph {
+    grid-area: graphs2;
+}
+
+.myTable {
+    grid-area: table;
+}
+
+.myTrack {
+    grid-area: track;
+    /* border: 3px solid white; */
+    text-align: center;
+    text-decoration: underline wavy;
+}
+
+input,
+textarea,
+button {
     outline: none;
 }

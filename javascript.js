@@ -1,4 +1,2 @@
 // Run at Startup
-function startup() {
-    
-}
+function startup() {}
