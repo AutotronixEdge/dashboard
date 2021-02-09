@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Autotronix</title>
+        <link
+            href="https://fonts.googleapis.com/icon?family=Material+Icons"
+            rel="stylesheet"
+        />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="css/materialize.min.css"
+            media="screen,projection"
+        />
+        <link
+            rel="stylesheet"
+            href="https://www.w3schools.com/w3css/3/w3.css"
+        />
+        <link rel="stylesheet" href="stylesheet.css" />
+        <script src="javascript.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+    </head>
+
+    <body>
+        <div class="myGraph2">
+            <canvas id="myChart2"></canvas>
+        </div>
+        <div class="myGraph">
+            <canvas id="myChart1"></canvas>
+        </div>
+        <div class="myTable">
+            <table class="striped highlight white-text">
+                <thead>
+                    <tr>
+                        <th>Lap #</th>
+                        <th>Lap Time</th>
+                        <th>Total Time</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <th>1</th>
+                        <th>20</th>
+                        <th>20</th>
+                    </tr>
+                    <tr>
+                        <th>2</th>
+                        <th>25</th>
+                        <th>45</th>
+                    </tr>
+                    <tr>
+                        <th>3</th>
+                        <th>15</th>
+                        <th>60</th>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="myTrack">
+            <h1>Track</h1>
+            <canvas id="trackCanvas" height="600%"></canvas>
+        </div>
+
+        <script>
+            let c = document.getElementById("trackCanvas");
+            let ctx = c.getContext("2d");
+            ctx.canvas.width = window.innerWidth * 0.495;
+            ctx.canvas.height = window.innerHeight * 0.98;
+
+            ctx.beginPath();
+            ctx.moveTo(200, 150);
+            ctx.quadraticCurveTo(200, 100, 250, 100);
+            ctx.lineTo(400, 100);
+            ctx.quadraticCurveTo(600, 100, 600, 300);
+            ctx.quadraticCurveTo(600, 800, 250, 800);
+            ctx.quadraticCurveTo(150, 800, 150, 650);
+            ctx.lineTo(150, 400);
+            ctx.quadraticCurveTo(150, 300, 175, 275);
+            ctx.quadraticCurveTo(200, 250, 200, 150);
+            ctx.scale(30, 30);
+            ctx.fillStyle = "maroon";
+            ctx.strokeStyle = "white";
+            ctx.stroke();
+            ctx.fill();
+
+            let myChart = document.getElementById("myChart1").getContext("2d");
+
+            // Global Options
+            Chart.defaults.global.defaultFontFamily = "Lato";
+            Chart.defaults.global.defaultFontSize = 18;
+            Chart.defaults.global.defaultFontColor = "white";
+
+            const xlabels = Array.from({ length: 100 }, (v, k) => k + 1); //x axis array
+            function getRandomArbitrary(min, max) {
+                let data = [];
+                let i;
+                for (i = 0; i < 100; i++) {
+                    data.push(Math.random() * (max - min) + min);
+                }
+                return data;
+            }
+            accelerationData = getRandomArbitrary(0, 200);
+            velocityData = [
+                1,
+                2,
+                6,
+                8,
+                11,
+                15,
+                18,
+                19,
+                20,
+                25,
+                28,
+                30,
+                32,
+                34,
+                35,
+                36,
+                40,
+                44,
+                45,
+                49,
+                51,
+                58,
+                59,
+                63,
+                64,
+                65,
+                67,
+                68,
+                72,
+                73,
+                81,
+                86,
+                87,
+                88,
+                89,
+                90,
+                93,
+                95,
+                96,
+                105,
+                106,
+                108,
+                109,
+                110,
+                111,
+                112,
+                113,
+                114,
+                115,
+                117,
+                118,
+                120,
+                121,
+                123,
+                124,
+                125,
+                127,
+                128,
+                129,
+                130,
+                134,
+                138,
+                139,
+                140,
+                141,
+                142,
+                145,
+                146,
+                147,
+                151,
+                154,
+                156,
+                158,
+                161,
+                162,
+                164,
+                165,
+                168,
+                170,
+                171,
+                172,
+                173,
+                174,
+                175,
+                176,
+                177,
+                178,
+                179,
+                180,
+                181,
+                184,
+                187,
+                188,
+                189,
+                193,
+                194,
+                195,
+                197,
+                199,
+                200,
+            ];
+            chartPadding = window.innerHeight * 0.15;
+
+            const massPopChart = new Chart(myChart, {
+                type: "line", // bar, horizontalBar, pie, Line, doughnut, radar, polarArea
+                data: {
+                    labels: xlabels,
+                    datasets: [
+                        {
+                            label: "Velocity",
+                            data: velocityData,
+                            backgroundColor: "rgba(120, 40, 40, 0.5)",
+                            borderWidth: 2,
+                            borderColor: "red",
+                        },
+                        {
+                            label: "Acceleration",
+                            data: accelerationData,
+                            backgroundColor: "rgba(50, 100, 150, 0.5)",
+                            borderWidth: 2,
+                            borderColor: "cyan",
+                        },
+                    ],
+                },
+                options: {
+                    title: {
+                        display: true,
+                        text: "Vehicle Statistics",
+                        fontSize: 24,
+                    },
+                    legend: {
+                        //display:false,        //hides legend
+                        position: "top",
+                        labels: {
+                            //fontColor: "red",     //change legend font color
+                        },
+                    },
+                    layout: {
+                        padding: {
+                            left: 0,
+                            right: 0,
+                            bottom: chartPadding,
+                            top: 0,
+                        },
+                    },
+                    tooltips: {
+                        //enabled:false,     //hides tooltips
+                        backgroundColor: "rgb(100,100,100,0.5)",
+                    },
+                    elements: {
+                        line: {
+                            //tension:0       //disables bezier curve
+                        },
+                    },
+                    //showLines: false,       //hides lines
+                    animation: {
+                        duration: 0, //disables animation
+                    },
+                },
+            });
+
+            let myChart2 = document.getElementById("myChart2").getContext("2d");
+
+            const massPopChart2 = new Chart(myChart2, {
+                type: "line", // bar, horizontalBar, pie, Line, doughnut, radar, polarArea
+                data: {
+                    labels: xlabels,
+                    datasets: [
+                        {
+                            label: "Velocity",
+                            data: velocityData,
+                            backgroundColor: "rgba(120, 40, 40, 0.5)",
+                            borderWidth: 2,
+                            borderColor: "red",
+                        },
+                        {
+                            label: "Acceleration",
+                            data: accelerationData,
+                            backgroundColor: "rgba(50, 100, 150, 0.5)",
+                            borderWidth: 2,
+                            borderColor: "cyan",
+                        },
+                    ],
+                },
+                options: {
+                    title: {
+                        display: true,
+                        text: "Vehicle Statistics",
+                        fontSize: 24,
+                    },
+                    legend: {
+                        //display:false,        //hides legend
+                        position: "top",
+                        labels: {
+                            //fontColor: "red",     //change legend font color
+                        },
+                    },
+                    layout: {
+                        padding: {
+                            left: 0,
+                            right: 0,
+                            bottom: chartPadding,
+                            top: 0,
+                        },
+                    },
+                    tooltips: {
+                        //enabled:false,     //hides tooltips
+                        backgroundColor: "rgb(100,100,100,0.5)",
+                    },
+                    elements: {
+                        line: {
+                            //tension:0       //disables bezier curve
+                        },
+                    },
+                    //showLines: false,       //hides lines
+                    animation: {
+                        duration: 0, //disables animation
+                    },
+                },
+            });
+        </script>
+    </body>
+</html>
