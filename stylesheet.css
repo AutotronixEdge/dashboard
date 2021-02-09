@@ -12,8 +12,8 @@
     --transparent: rgb(255, 255, 255, 0);
 
     /* ~~ Numbers ~~ */
-    --spacing: 10px;
-    --cornerRadius: 3px;
+    --spacing: 0px;
+    --cornerRadius: 10px;
     --transitionTime: 0.2s;
 }
 
@@ -23,35 +23,98 @@ body {
     color: var(--textColor);
     height: 100vh;
     padding: var(--spacing);
+    margin: 0px;
     user-select: none;
+
     display: grid;
-
-    grid-template-columns: 50% 50%;
-    grid-template-rows: 35% 35% 30%;
-
+    grid-template-columns: 18.75% 18.75% 37.5% 25%;
+    grid-template-rows: 25% 25% 25% 25%;
     grid-template-areas:
-        "graphs1 track"
-        "graphs2 track"
-        "table track";
+        "gas brake accelX buttons"
+        "steering steering accelY map"
+        "velocity velocity velocity map"
+        "laps laps laps map";
 }
 
-.myGraph2 {
-    grid-area: graphs1;
+.gasGraph {
+    grid-area: gas;
 }
 
-.myGraph {
-    grid-area: graphs2;
+#gasGraph {
+    height: 100%;
 }
 
-.myTable {
-    grid-area: table;
+.brakeGraph {
+    grid-area: brake;
 }
 
-.myTrack {
-    grid-area: track;
-    /* border: 3px solid white; */
-    text-align: center;
-    text-decoration: underline wavy;
+#brakeGraph {
+    height: 100%;
+}
+
+.accelXGraph {
+    grid-area: accelX;
+}
+
+#accelXGraph {
+    height: 100%;
+}
+
+.steeringGraph {
+    grid-area: steering;
+}
+
+#steeringGraph {
+    height: 100%;
+}
+
+.accelYGraph {
+    grid-area: accelY;
+}
+
+#accelYGraph {
+    height: 100%;
+}
+
+.velocityGraph {
+    grid-area: velocity;
+}
+
+#velocityGraph {
+    height: 100%;
+}
+
+.laps {
+    grid-area: laps;
+}
+
+#laps {
+    height: 100%;
+    width: 100%;
+}
+
+.buttons {
+    grid-area: buttons;
+}
+
+#startStopButton {
+    width: 45%;
+    height: 50px;
+    border-radius: var(--cornerRadius);
+    border-width: calc(var(--cornerRadius) / 2);
+    border-color: var(--primColor);
+    background-color: var(--quatColor);
+    color: var(--textColor);
+}
+
+#resetButton {
+    width: 45%;
+    height: 50px;
+    border-radius: var(--cornerRadius);
+    border-width: calc(var(--cornerRadius) / 2);
+    border-color: var(--primColor);
+    background-color: var(--tertColor);
+    color: var(--textColor);
 }
 
 input,

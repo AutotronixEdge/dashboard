@@ -4,7 +4,7 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Autotronix Dashboard</title>
-        <link rel="stylesheet" href="stylesheet2.css" />
+        <link rel="stylesheet" href="stylesheet.css" />
         <script src="javascript.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
@@ -30,7 +30,33 @@
             <div id="velocityGraph"></div>
         </div>
         <div class="laps">
-            <div id="laps">test</div>
+            <table id="laps">
+                <thead>
+                    <tr>
+                        <th>Lap #</th>
+                        <th>Lap Time</th>
+                        <th>Total Time</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <th>1</th>
+                        <th>20</th>
+                        <th>20</th>
+                    </tr>
+                    <tr>
+                        <th>2</th>
+                        <th>25</th>
+                        <th>45</th>
+                    </tr>
+                    <tr>
+                        <th>3</th>
+                        <th>15</th>
+                        <th>60</th>
+                    </tr>
+                </tbody>
+            </table>
         </div>
         <div class="buttons">
             <input id="startStopButton" type="button" value="Start / Stop" onclick="startStopGraph()">
