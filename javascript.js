@@ -10,6 +10,40 @@ function startup() {
             updatePlotly(myData);
         }
     }
+
+    // TABLE STUFF-----------------------------------------------------------------
+    var columnDefs = [
+        { field: "lapNumber" },
+        { field: "lapTime" },
+        { field: "lapSection1" },
+        { field: "lapSection2" },
+        { field: "lapSection3" },
+        { field: "lapSection4" },
+        { field: "lapSection5" },
+    ];
+
+    // specify the data
+    var rowData = [
+        { lapNumber: "1", lapTime: "4:10", lapSection1: "1:10" },
+        { lapNumber: "2", lapTime: "3:30", lapSection1: "1:00" },
+        { lapNumber: "3", lapTime: "3:45", lapSection1: "1:10" },
+        { lapNumber: "4", lapTime: "3:45", lapSection1: "1:10" },
+        { lapNumber: "5", lapTime: "3:45", lapSection1: "1:10" },
+        { lapNumber: "6", lapTime: "3:45", lapSection1: "1:10" },
+    ];
+
+    // let the grid know which columns and what data to use
+    var gridOptions = {
+        columnDefs: columnDefs,
+        rowData: rowData,
+    };
+
+    // setup the grid after the page has finished loading
+    document.addEventListener("DOMContentLoaded", function () {
+        var gridDiv = document.querySelector("#myGrid");
+        new agGrid.Grid(gridDiv, gridOptions);
+    });
+    // TABLE STUFF-----------------------------------------------------------------
 }
 
 function getBaseline() {
@@ -170,10 +204,10 @@ function updatePlotly(myData) {
     };
 
     var layout = {
-        title: "Vehicle Data Graph",
+        // title: "Vehicle Data Graph",
         xaxis: {
             title: "time (s)",
-            // range: [0, 200], //Constant Range
+            range: [0, 200], //Constant Range
             showgrid: false,
             // showline: true,
             // zeroline: true,
@@ -192,7 +226,7 @@ function updatePlotly(myData) {
             },
         },
         yaxis: {
-            title: "Velocity (mph) / Acceleration (m/s^2)",
+            title: "Velocity & Acceleration",
             showgrid: false,
             zerolinecolor: "white",
             tickfont: {

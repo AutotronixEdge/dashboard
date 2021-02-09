@@ -12,7 +12,7 @@
     --transparent: rgb(255, 255, 255, 0);
 
     /* ~~ Numbers ~~ */
-    --spacing: 0px;
+    --spacing: 15px;
     --cornerRadius: 10px;
     --transitionTime: 0.2s;
 }
@@ -22,79 +22,102 @@ body {
     background: var(--bgColor);
     color: var(--textColor);
     height: 100vh;
-    padding: var(--spacing);
+    padding: 0px;
     margin: 0px;
     user-select: none;
 
     display: grid;
-    grid-template-columns: 18.75% 18.75% 37.5% 25%;
+    grid-template-columns: 18.75% 18.75% 18.75% 18.75% 25%;
     grid-template-rows: 25% 25% 25% 25%;
     grid-template-areas:
-        "gas brake accelX buttons"
-        "steering steering accelY map"
-        "velocity velocity velocity map"
-        "laps laps laps map";
+        "velocity velocity gas gas buttons"
+        "accelY accelY brake brake map"
+        "accelX accelX steering steering map"
+        "laps laps laps lapTimes map";
 }
 
+/* ~~ Gas Graph ~~ */
 .gasGraph {
     grid-area: gas;
+    margin: var(--spacing);
 }
 
 #gasGraph {
     height: 100%;
 }
 
+/* ~~ Brake Graph ~~ */
 .brakeGraph {
     grid-area: brake;
+    margin: var(--spacing);
 }
 
 #brakeGraph {
     height: 100%;
 }
 
+/* ~~ X Acceleration Graph ~~ */
 .accelXGraph {
     grid-area: accelX;
+    margin: var(--spacing);
 }
 
 #accelXGraph {
     height: 100%;
 }
 
+/* ~~ Steering Wheel Graph ~~ */
 .steeringGraph {
     grid-area: steering;
+    margin: var(--spacing);
 }
 
 #steeringGraph {
     height: 100%;
 }
 
+/* ~~ Y Acceleration Graph ~~ */
 .accelYGraph {
     grid-area: accelY;
+    margin: var(--spacing);
 }
 
 #accelYGraph {
     height: 100%;
 }
 
+/* ~~ Velocity Graph ~~ */
 .velocityGraph {
     grid-area: velocity;
+    margin: var(--spacing);
 }
 
 #velocityGraph {
     height: 100%;
 }
 
+/* ~~ Tap Time Table ~~ */
 .laps {
     grid-area: laps;
 }
 
-#laps {
+.lapTimes {
+    grid-area: lapTimes;
+}
+
+#myGrid {
     height: 100%;
     width: 100%;
 }
 
+/* ~~ Buttons ~~ */
 .buttons {
     grid-area: buttons;
+    padding-top: var(--spacing);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-evenly;
 }
 
 #startStopButton {
@@ -105,6 +128,7 @@ body {
     border-color: var(--primColor);
     background-color: var(--quatColor);
     color: var(--textColor);
+    font-size: 15pt;
 }
 
 #resetButton {
@@ -115,6 +139,22 @@ body {
     border-color: var(--primColor);
     background-color: var(--tertColor);
     color: var(--textColor);
+    font-size: 15pt;
+}
+
+/* ~~ Track ~~ */
+.map {
+    grid-area: map;
+}
+
+#map {
+}
+
+#logo {
+    position: absolute;
+    width: 15%;
+    bottom: 0;
+    right: 5%;
 }
 
 input,

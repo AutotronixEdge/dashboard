@@ -5,68 +5,69 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Autotronix Dashboard</title>
         <link rel="stylesheet" href="stylesheet.css" />
+        <link rel="icon" href="autotronixLogoLetter.png" />
         <script src="javascript.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+        <script src="https://unpkg.com/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/ag-grid-community/dist/styles/ag-grid.css"
+        />
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/ag-grid-community/dist/styles/ag-theme-alpine-dark.css"
+        />
     </head>
 
     <body>
         <div class="gasGraph">
-            <div id="gasGraph"></div>
+            <div id="gasGraph">Gas</div>
         </div>
-        </div class="brakeGraph">
-            <div id="brakeGraph"></div>
+        <div class="brakeGraph">
+            <div id="brakeGraph">Braking</div>
         </div>
         <div class="accelXGraph">
-            <div id="accelXGraph"></div>
+            <div id="accelXGraph">X-axis Acceleration</div>
         </div>
         <div class="steeringGraph">
-            <div id="steeringGraph"></div>
+            <div id="steeringGraph">Steering Wheel Rotation</div>
         </div>
         <div class="accelYGraph">
-            <div id="accelYGraph"></div>
+            <div id="accelYGraph">Y-axis Acceleration</div>
         </div>
         <div class="velocityGraph">
-            <div id="velocityGraph"></div>
+            <div id="velocityGraph">Velocity</div>
         </div>
         <div class="laps">
-            <table id="laps">
-                <thead>
-                    <tr>
-                        <th>Lap #</th>
-                        <th>Lap Time</th>
-                        <th>Total Time</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <tr>
-                        <th>1</th>
-                        <th>20</th>
-                        <th>20</th>
-                    </tr>
-                    <tr>
-                        <th>2</th>
-                        <th>25</th>
-                        <th>45</th>
-                    </tr>
-                    <tr>
-                        <th>3</th>
-                        <th>15</th>
-                        <th>60</th>
-                    </tr>
-                </tbody>
-            </table>
+            <div id="myGrid" class="ag-theme-alpine-dark"></div>
+        </div>
+        <div class="lapTimes">
+            <div id="lapTimes"></div>
         </div>
         <div class="buttons">
-            <input id="startStopButton" type="button" value="Start / Stop" onclick="startStopGraph()">
-            <input id="resetButton" type="button" value="Reset" onclick="resetGraph()">
+            <input
+                id="startStopButton"
+                type="button"
+                value="Start / Stop"
+                onclick="startStopGraph()"
+            />
+            <input
+                id="resetButton"
+                type="button"
+                value="Reset"
+                onclick="resetGraph()"
+            />
         </div>
         <div class="map">
             <div id="map"></div>
+
+            <img id="logo" src="autotronixLogoOpaque.png" />
         </div>
+
         <script>
-            startup()
+            startup();
         </script>
     </body>
 </html>
