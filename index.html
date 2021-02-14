@@ -4,13 +4,19 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Autotronix Dashboard</title>
-        <link rel="stylesheet" href="stylesheet.css" />
+
+        <!-- Local Files -->
         <link rel="icon" href="autotronixLogoLetter.png" />
-        <script src="javascript.js"></script>
+        <link rel="stylesheet" href="stylesheet.css" />
+        <script src="main.js"></script>
+
+        <!-- Graphing -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
+        <!-- Tables -->
         <script src="https://unpkg.com/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
+        <script src="https://unpkg.com/@ag-grid-community/all-modules@25.0.0/dist/ag-grid-community.min.js"></script>
         <link
             rel="stylesheet"
             href="https://unpkg.com/ag-grid-community/dist/styles/ag-grid.css"
@@ -22,6 +28,7 @@
     </head>
 
     <body>
+        <!-- Graphs -->
         <div class="gasGraph">
             <div id="gasGraph">Gas</div>
         </div>
@@ -40,12 +47,16 @@
         <div class="velocityGraph">
             <div id="velocityGraph">Velocity</div>
         </div>
+
+        <!-- Lap Time Table -->
         <div class="laps">
             <div id="myGrid" class="ag-theme-alpine-dark"></div>
         </div>
         <div class="lapTimes">
             <div id="lapTimes"></div>
         </div>
+
+        <!-- Buttons -->
         <div class="buttons">
             <input
                 id="startStopButton"
@@ -60,12 +71,15 @@
                 onclick="resetGraph()"
             />
         </div>
+
+        <!-- Track -->
         <div class="map">
             <div id="map"></div>
 
             <img id="logo" src="autotronixLogoOpaque.png" />
         </div>
 
+        <!-- Startup Script -->
         <script>
             startup();
         </script>

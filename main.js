@@ -1,11 +1,13 @@
 // Run at Startup
 function startup() {
-    var myVar = setInterval(myTimer, 100);
+    myTimer = setInterval(timerFunction, 100);
+
     inSession = false;
+
     myData = getBaseline();
     updatePlotly(myData);
 
-    function myTimer() {
+    function timerFunction() {
         if (inSession) {
             updatePlotly(myData);
         }
@@ -13,36 +15,47 @@ function startup() {
 
     // TABLE STUFF-----------------------------------------------------------------
     var columnDefs = [
-        { field: "lapNumber" },
-        { field: "lapTime" },
-        { field: "lapSection1" },
-        { field: "lapSection2" },
-        { field: "lapSection3" },
-        { field: "lapSection4" },
-        { field: "lapSection5" },
+        { headerName: "#", field: "lapNumber", width: 50 },
+        { headerName: "Lap Time", field: "lapTime", width: 100 },
+        { headerName: "S1", field: "ls1", width: 100 },
+        { headerName: "S2", field: "ls2", width: 100 },
+        { headerName: "S3", field: "ls3", width: 100 },
+        { headerName: "S4", field: "ls4", width: 100 },
+        { headerName: "S5", field: "ls5", width: 100 },
     ];
 
     // specify the data
     var rowData = [
-        { lapNumber: "1", lapTime: "4:10", lapSection1: "1:10" },
-        { lapNumber: "2", lapTime: "3:30", lapSection1: "1:00" },
-        { lapNumber: "3", lapTime: "3:45", lapSection1: "1:10" },
-        { lapNumber: "4", lapTime: "3:45", lapSection1: "1:10" },
-        { lapNumber: "5", lapTime: "3:45", lapSection1: "1:10" },
-        { lapNumber: "6", lapTime: "3:45", lapSection1: "1:10" },
+        { lapNumber: 1, lapTime: "4:10", ls1: "1:10" },
+        { lapNumber: 2, lapTime: "3:30", ls1: "1:00" },
+        { lapNumber: 3, lapTime: "3:45", ls1: "1:10" },
+        { lapNumber: 4, lapTime: "3:45", ls1: "1:10" },
+        { lapNumber: 5, lapTime: "3:45", ls1: "1:10" },
+        { lapNumber: 6, lapTime: "3:45", ls1: "1:10" },
     ];
 
     // let the grid know which columns and what data to use
     var gridOptions = {
+        defaultColDef: {
+            resizable: true,
+            sortable: true,
+        },
         columnDefs: columnDefs,
         rowData: rowData,
     };
-
     // setup the grid after the page has finished loading
     document.addEventListener("DOMContentLoaded", function () {
         var gridDiv = document.querySelector("#myGrid");
         new agGrid.Grid(gridDiv, gridOptions);
     });
+
+    // function sizeToFit() {
+    //     gridOptions.api.sizeColumnsToFit();
+    // }
+    // sizeToFit();
+    // gridApi.sizeColumnsToFit();
+    // gridOptions.sizeColumnsToFit();
+    // gridOptions.api.sizeColumnsToFit();
     // TABLE STUFF-----------------------------------------------------------------
 }
 
@@ -161,14 +174,28 @@ function getBaseline() {
         200,
     ];
 
-    return { x: xLabels, y1: velocityData, y2: accelerationData };
+    let currentTime = [
+        [new Date().getMinutes(), new Date().getSeconds()].join(":"),
+    ];
+
+    return {
+        x: xLabels,
+        y1: velocityData,
+        y2: accelerationData,
+        time: currentTime,
+    };
 }
 
 function updatePlotly(myData) {
+    // Generated Data
     myData.x.push(myData.x[myData.x.length - 1] + 1);
     myData.y1.push(50 * Math.sin(myData.x[myData.x.length - 1]) + 100);
     myData.y2.push(100 * Math.cos(myData.x[myData.x.length - 1]) + 100);
+    myData.time.push(
+        [new Date().getMinutes(), new Date().getSeconds()].join(":")
+    );
 
+    // Update Graphs
     var velTrace = {
         x: myData.x,
         y: myData.y1,
@@ -274,10 +301,12 @@ function updatePlotly(myData) {
 
 function startStopGraph() {
     inSession = !inSession;
+    console.log("Start / Stop");
 }
 
 function resetGraph() {
     myData = getBaseline();
     inSession = false;
     updatePlotly(myData);
+    console.log("Reset");
 }
