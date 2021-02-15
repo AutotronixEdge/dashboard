@@ -57,6 +57,44 @@ function startup() {
     // gridOptions.sizeColumnsToFit();
     // gridOptions.api.sizeColumnsToFit();
     // TABLE STUFF-----------------------------------------------------------------
+
+    //------------------------------------ html request ------------------------------------
+    var userName = "dannyharris2";
+    var passWord = "oi6ZeQBvC95NuD1XvR8GJKzxtFZP6n";
+
+    function authenticateUser(user, password) {
+        var token = user + ":" + password;
+
+        // Should i be encoding this value????? does it matter???
+        // Base64 Encoding -> btoa
+        var hash = btoa(token);
+
+        return "Basic " + hash;
+    }
+
+    function CallWebAPI() {
+        // New XMLHTTPRequest
+        var request = new XMLHttpRequest();
+        request.open(
+            "GET",
+            "https://dry-eyrie-70197.herokuapp.com/https://rest.textmagic.com/api/v2/replies",
+            false
+        );
+        request.setRequestHeader(
+            "Authorization",
+            authenticateUser(userName, passWord)
+        );
+        request.send();
+        // view request status
+        // alert(request.status);
+        // response.innerHTML = request.responseText;
+        let testVar = request.responseText;
+        testVar = JSON.parse(testVar);
+        console.log(testVar.resources);
+        document.getElementById("map").innerHTML = testVar.resources[0].text;
+    }
+    CallWebAPI();
+    //------------------------------------ html request ------------------------------------
 }
 
 function getBaseline() {
