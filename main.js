@@ -1,6 +1,6 @@
 // Run at Startup
-function startup() {
-    myTimer = setInterval(timerFunction, 100);
+async function startup() {
+    myTimer = setInterval(timerFunction, 1000);
 
     inSession = false;
 
@@ -13,25 +13,33 @@ function startup() {
         }
     }
 
-    // TABLE STUFF-----------------------------------------------------------------
+    // TABLE STUFF-----------------------------------------------------------------T
+    viewWidth = window.innerWidth;
+    viewWidth = viewWidth * 0.55 - 60;
+    colWidth = viewWidth / 6;
+
     var columnDefs = [
-        { headerName: "#", field: "lapNumber", width: 50 },
-        { headerName: "Lap Time", field: "lapTime", width: 100 },
-        { headerName: "S1", field: "ls1", width: 100 },
-        { headerName: "S2", field: "ls2", width: 100 },
-        { headerName: "S3", field: "ls3", width: 100 },
-        { headerName: "S4", field: "ls4", width: 100 },
-        { headerName: "S5", field: "ls5", width: 100 },
+        { headerName: "#", field: "lapNumber", width: 60 },
+        { headerName: "Lap Time", field: "lapTime", width: colWidth },
+        { headerName: "S1", field: "ls1", width: colWidth },
+        { headerName: "S2", field: "ls2", width: colWidth },
+        { headerName: "S3", field: "ls3", width: colWidth },
+        { headerName: "S4", field: "ls4", width: colWidth },
+        { headerName: "S5", field: "ls5", width: colWidth },
     ];
 
     // specify the data
     var rowData = [
-        { lapNumber: 1, lapTime: "4:10", ls1: "1:10" },
-        { lapNumber: 2, lapTime: "3:30", ls1: "1:00" },
-        { lapNumber: 3, lapTime: "3:45", ls1: "1:10" },
-        { lapNumber: 4, lapTime: "3:45", ls1: "1:10" },
-        { lapNumber: 5, lapTime: "3:45", ls1: "1:10" },
-        { lapNumber: 6, lapTime: "3:45", ls1: "1:10" },
+        { lapNumber: 1, lapTime: 410, ls1: "1:10" },
+        { lapNumber: 2, lapTime: 330, ls1: "1:00" },
+        { lapNumber: 3, lapTime: 345, ls1: "1:10" },
+        { lapNumber: 4, lapTime: 345, ls1: "1:10" },
+        { lapNumber: 5, lapTime: 350, ls1: "1:10" },
+        { lapNumber: 6, lapTime: 340, ls1: "1:10" },
+        { lapNumber: 7, lapTime: 340, ls1: "1:10" },
+        { lapNumber: 8, lapTime: 340, ls1: "1:10" },
+        { lapNumber: 9, lapTime: 340, ls1: "1:10" },
+        { lapNumber: 10, lapTime: 340, ls1: "1:10" },
     ];
 
     // let the grid know which columns and what data to use
@@ -49,24 +57,24 @@ function startup() {
         new agGrid.Grid(gridDiv, gridOptions);
     });
 
-    // function sizeToFit() {
-    //     gridOptions.api.sizeColumnsToFit();
-    // }
-    // sizeToFit();
-    // gridApi.sizeColumnsToFit();
-    // gridOptions.sizeColumnsToFit();
-    // gridOptions.api.sizeColumnsToFit();
-    // TABLE STUFF-----------------------------------------------------------------
+    // ----- Table Data -----
+    var i;
+    var rowDataSum = 0;
+    for (i = 0; i < rowData.length; i++) {
+        rowDataSum = rowDataSum + rowData[i].lapTime;
+    }
+    rowDataAvg = rowDataSum / rowData.length;
+    document.getElementById("lapTimes").innerHTML =
+        "Average Lap Time: " + rowDataAvg.toFixed(2) + " s";
+    // ----- Table Data -----
+    // TABLE STUFF-----------------------------------------------------------------T
 
-    //------------------------------------ html request ------------------------------------
+    //------------------------------------ html request ------------------------------------H
     var userName = "dannyharris2";
     var passWord = "oi6ZeQBvC95NuD1XvR8GJKzxtFZP6n";
 
     function authenticateUser(user, password) {
         var token = user + ":" + password;
-
-        // Should i be encoding this value????? does it matter???
-        // Base64 Encoding -> btoa
         var hash = btoa(token);
 
         return "Basic " + hash;
@@ -85,17 +93,112 @@ function startup() {
             authenticateUser(userName, passWord)
         );
         request.send();
-        // view request status
-        // alert(request.status);
-        // response.innerHTML = request.responseText;
-        let testVar = request.responseText;
+        let testVar = request.response;
         testVar = JSON.parse(testVar);
-        console.log(testVar.resources);
         document.getElementById("map").innerHTML = testVar.resources[0].text;
     }
-    CallWebAPI();
-    //------------------------------------ html request ------------------------------------
+    // CallWebAPI();
+    //------------------------------------ html request ------------------------------------H
 }
+
+//-------------------------------- html request method 2 --------------------------------H
+testData = {};
+
+testDataSet = {
+    testEncoder: [],
+    testIR1: [],
+    testIR2: [],
+    testAccelX: [],
+    testAccelY: [],
+    testLat: [],
+    testLon: [],
+    testTime: [],
+};
+
+previousData = "";
+startTime = Date.now();
+currentTime = 0;
+
+async function storeData() {
+    // Fetch Data
+    async function fetchData() {
+        const response = await fetch(
+            "https://dry-eyrie-70197.herokuapp.com/https://rest.textmagic.com/api/v2/replies",
+            {
+                headers: {
+                    Authorization:
+                        "Basic " +
+                        btoa("dannyharris2:oi6ZeQBvC95NuD1XvR8GJKzxtFZP6n"),
+                },
+            }
+        );
+        return response.json();
+    }
+    // Save Data in Variable
+    testData = await fetchData().catch((error) => {
+        console.log("error!");
+        console.error(error);
+    });
+
+    splitTestData = testData.resources[0].text.split(",");
+
+    if (
+        (!splitTestData.some(isNaN) && previousData != splitTestData) ||
+        previousData == ""
+    ) {
+        currentTime = Date.now();
+        timeDiff = (currentTime - startTime) / 1000;
+
+        testDataSet.testEncoder.push(splitTestData[0]);
+        testDataSet.testIR1.push(splitTestData[1]);
+        testDataSet.testIR2.push(splitTestData[2]);
+        testDataSet.testAccelX.push(splitTestData[3]);
+        testDataSet.testAccelY.push(splitTestData[4]);
+        testDataSet.testLat.push(splitTestData[5]);
+        testDataSet.testLon.push(splitTestData[6]);
+        testDataSet.testTime.push(timeDiff);
+
+        console.log("Current Data Set:");
+        console.log(testDataSet);
+
+        // Display Latest Data
+        document.getElementById("map").innerHTML =
+            "<b>Encoder:</b>" +
+            "<br />" +
+            testDataSet.testEncoder +
+            "<br />" +
+            "<b>IR 1:</b>" +
+            "<br />" +
+            testDataSet.testIR1 +
+            "<br />" +
+            "<b>IR 2:</b>" +
+            "<br />" +
+            testDataSet.testIR2 +
+            "<br />" +
+            "<b>Accel X:</b>" +
+            "<br />" +
+            testDataSet.testAccelX +
+            "<br />" +
+            "<b>Accel Y:</b>" +
+            "<br />" +
+            testDataSet.testAccelY +
+            "<br />" +
+            "<b>Latitude:</b>" +
+            "<br />" +
+            testDataSet.testLat +
+            "<br />" +
+            "<b>Longitude:</b>" +
+            "<br />" +
+            testDataSet.testLon +
+            "<br />" +
+            "<b>Time:</b>" +
+            "<br />" +
+            testDataSet.testTime;
+    }
+
+    previousData = splitTestData.toString();
+}
+//-------------------------------- html request method 2 --------------------------------H
 
 function getBaseline() {
     function getRandomArbitrary(min, max) {
@@ -225,6 +328,10 @@ function getBaseline() {
 }
 
 function updatePlotly(myData) {
+    //
+    storeData();
+    //
+
     // Generated Data
     myData.x.push(myData.x[myData.x.length - 1] + 1);
     myData.y1.push(50 * Math.sin(myData.x[myData.x.length - 1]) + 100);
@@ -340,6 +447,7 @@ function updatePlotly(myData) {
 function startStopGraph() {
     inSession = !inSession;
     console.log("Start / Stop");
+    startTime = Date.now();
 }
 
 function resetGraph() {

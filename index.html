@@ -9,26 +9,16 @@
         <link rel="icon" href="autotronixLogoLetter.png" />
         <link rel="stylesheet" href="stylesheet.css" />
         <script src="main.js"></script>
-        <script src="test.js"></script>
 
         <!-- Graphing -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
         <!-- Tables -->
-        <script src="https://unpkg.com/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
         <script src="https://unpkg.com/@ag-grid-community/all-modules@25.0.0/dist/ag-grid-community.min.js"></script>
-        <link
-            rel="stylesheet"
-            href="https://unpkg.com/ag-grid-community/dist/styles/ag-grid.css"
-        />
-        <link
-            rel="stylesheet"
-            href="https://unpkg.com/ag-grid-community/dist/styles/ag-theme-alpine-dark.css"
-        />
     </head>
 
-    <body>
+    <body class="grid">
         <!-- Graphs -->
         <div class="gasGraph">
             <div id="gasGraph">Gas</div>
@@ -83,7 +73,6 @@
         <!-- Startup Script -->
         <script>
             startup();
-            testJS();
         </script>
     </body>
 </html>

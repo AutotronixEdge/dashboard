@@ -25,7 +25,9 @@ body {
     padding: 0px;
     margin: 0px;
     user-select: none;
+}
 
+.grid {
     display: grid;
     grid-template-columns: 18.75% 18.75% 18.75% 18.75% 25%;
     grid-template-rows: 25% 25% 25% 25%;
@@ -34,6 +36,7 @@ body {
         "accelY accelY brake brake map"
         "accelX accelX steering steering map"
         "laps laps laps lapTimes map";
+    text-align: center;
 }
 
 /* ~~ Gas Graph ~~ */
@@ -103,6 +106,7 @@ body {
 
 .lapTimes {
     grid-area: lapTimes;
+    padding: 15px;
 }
 
 #myGrid {
@@ -157,8 +161,157 @@ body {
     right: 5%;
 }
 
+/* ~~ Extra ~~ */
 input,
 textarea,
 button {
     outline: none;
+}
+
+/* ~~ Resize for Mobile ~~ */
+@media all and (max-aspect-ratio: 1/1) {
+    .grid {
+        display: grid;
+        grid-template-columns: 100%;
+        grid-template-rows: 25% 75% 50% 50% 50% 50% 50% 50% 25% 100%;
+        grid-template-areas:
+            "buttons"
+            "map"
+            "velocity"
+            "accelY"
+            "accelX"
+            "gas"
+            "brake"
+            "steering"
+            "lapTimes"
+            "laps";
+
+        font-size: 2.5vh;
+    }
+
+    /* ~~ Gas Graph ~~ */
+    .gasGraph {
+        margin: 0px;
+        padding: 5vh 0px 5vh 0px;
+    }
+
+    #gasGraph {
+        height: 100%;
+    }
+
+    /* ~~ Brake Graph ~~ */
+    .brakeGraph {
+        margin: 0px;
+        padding: 5vh 0px 5vh 0px;
+    }
+
+    #brakeGraph {
+        height: 100%;
+    }
+
+    /* ~~ X Acceleration Graph ~~ */
+    .accelXGraph {
+        margin: 0px;
+        padding: 5vh 0px 5vh 0px;
+    }
+
+    #accelXGraph {
+        height: 100%;
+    }
+
+    /* ~~ Steering Wheel Graph ~~ */
+    .steeringGraph {
+        margin: 0px;
+        padding: 5vh 0px 5vh 0px;
+    }
+
+    #steeringGraph {
+        height: 100%;
+    }
+
+    /* ~~ Y Acceleration Graph ~~ */
+    .accelYGraph {
+        margin: 0px;
+        padding: 5vh 0px 5vh 0px;
+    }
+
+    #accelYGraph {
+        height: 100%;
+    }
+
+    /* ~~ Velocity Graph ~~ */
+    .velocityGraph {
+        margin: 0px;
+        padding: 5vh 0px 5vh 0px;
+    }
+
+    #velocityGraph {
+        height: 100%;
+    }
+
+    /* ~~ Tap Time Table ~~ */
+    .laps {
+        margin: 0px;
+    }
+
+    .lapTimes {
+        margin: 0px;
+        padding: 5vh 0px 5vh 0px;
+        text-align: center;
+        line-height: 12.5vh;
+        font-size: 5vw; /* temporary font */
+    }
+
+    #myGrid {
+        height: 100%;
+        width: 100%;
+    }
+
+    /* ~~ Buttons ~~ */
+    .buttons {
+        grid-area: buttons;
+        padding-top: var(--spacing);
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: space-evenly;
+    }
+
+    #startStopButton {
+        width: 45%;
+        height: 50px;
+        border-radius: var(--cornerRadius);
+        border-width: calc(var(--cornerRadius) / 2);
+        border-color: var(--primColor);
+        background-color: var(--quatColor);
+        color: var(--textColor);
+        font-size: 15pt;
+    }
+
+    #resetButton {
+        width: 45%;
+        height: 50px;
+        border-radius: var(--cornerRadius);
+        border-width: calc(var(--cornerRadius) / 2);
+        border-color: var(--primColor);
+        background-color: var(--tertColor);
+        color: var(--textColor);
+        font-size: 15pt;
+    }
+
+    /* ~~ Track ~~ */
+    .map {
+        grid-area: map;
+        font-size: 10vw; /* temporary font */
+    }
+
+    #map {
+    }
+
+    #logo {
+        position: absolute;
+        width: 100%;
+        bottom: 0;
+        right: 0%;
+    }
 }
