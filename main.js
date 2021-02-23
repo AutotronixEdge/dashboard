@@ -105,14 +105,15 @@ async function startup() {
 testData = {};
 
 testDataSet = {
-    testEncoder: [],
-    testIR1: [],
-    testIR2: [],
-    testAccelX: [],
-    testAccelY: [],
-    testLat: [],
-    testLon: [],
-    testTime: [],
+    testEncoder: [0],
+    testIR1: [0],
+    testIR2: [0],
+    testAccelX: [0],
+    testAccelY: [0],
+    testLat: [0],
+    testLon: [0],
+    testVel: [0],
+    testTime: [0],
 };
 
 previousData = "";
@@ -197,6 +198,8 @@ async function storeData() {
     }
 
     previousData = splitTestData.toString();
+
+    return testDataSet;
 }
 //-------------------------------- html request method 2 --------------------------------H
 
@@ -327,9 +330,9 @@ function getBaseline() {
     };
 }
 
-function updatePlotly(myData) {
+async function updatePlotly(myData) {
     //
-    storeData();
+    receivedData = await storeData();
     //
 
     // Generated Data
@@ -340,7 +343,7 @@ function updatePlotly(myData) {
         [new Date().getMinutes(), new Date().getSeconds()].join(":")
     );
 
-    // Update Graphs
+    // Update Velocity Test Graph
     var velTrace = {
         x: myData.x,
         y: myData.y1,
@@ -354,8 +357,8 @@ function updatePlotly(myData) {
             width: 2,
             shape: "spline",
         },
-        text: "mph",
-        name: "Velocity",
+        text: "m/s*",
+        name: "Test Velocity",
     };
 
     var accelTrace = {
@@ -371,15 +374,101 @@ function updatePlotly(myData) {
             width: 2,
             shape: "spline",
         },
+        text: "m/s^2*",
+        name: "Test Acceleration",
+    };
+
+    // Update Graphs
+    var accelYTrace = {
+        x: receivedData.testTime,
+        y: receivedData.testAccelY,
+        mode: "lines+markers",
+        marker: {
+            color: "cyan",
+            size: 6,
+        },
+        line: {
+            color: "cyan",
+            width: 2,
+            shape: "spline",
+        },
         text: "m/s^2",
-        name: "Acceleration",
+        name: "Y-Axis Acceleration",
+    };
+
+    var accelXTrace = {
+        x: receivedData.testTime,
+        y: receivedData.testAccelX,
+        mode: "lines+markers",
+        marker: {
+            color: "cyan",
+            size: 6,
+        },
+        line: {
+            color: "cyan",
+            width: 2,
+            shape: "spline",
+        },
+        text: "m/s^2",
+        name: "X-Axis Acceleration",
+    };
+
+    var gasTrace = {
+        x: receivedData.testTime,
+        y: receivedData.testIR1,
+        mode: "lines+markers",
+        marker: {
+            color: "cyan",
+            size: 6,
+        },
+        line: {
+            color: "cyan",
+            width: 2,
+            shape: "spline",
+        },
+        text: "cm",
+        name: "Gas Pedal",
+    };
+
+    var brakeTrace = {
+        x: receivedData.testTime,
+        y: receivedData.testIR2,
+        mode: "lines+markers",
+        marker: {
+            color: "cyan",
+            size: 6,
+        },
+        line: {
+            color: "cyan",
+            width: 2,
+            shape: "spline",
+        },
+        text: "cm",
+        name: "Brake Pedal",
+    };
+
+    var steerTrace = {
+        x: receivedData.testTime,
+        y: receivedData.testEncoder,
+        mode: "lines+markers",
+        marker: {
+            color: "cyan",
+            size: 6,
+        },
+        line: {
+            color: "cyan",
+            width: 2,
+            shape: "spline",
+        },
+        text: "degrees*",
+        name: "Steering Wheel Rotation",
     };
 
     var layout = {
         // title: "Vehicle Data Graph",
         xaxis: {
-            title: "time (s)",
-            range: [0, 200], //Constant Range
+            title: "",
+            // range: [0, 200], //Constant Range
             showgrid: false,
             // showline: true,
             // zeroline: true,
@@ -398,7 +487,7 @@ function updatePlotly(myData) {
             },
         },
         yaxis: {
-            title: "Velocity & Acceleration",
+            title: "",
             showgrid: false,
             zerolinecolor: "white",
             tickfont: {
@@ -411,7 +500,7 @@ function updatePlotly(myData) {
         plot_bgcolor: "transparent",
         paper_bgcolor: "transparent",
         margin: {
-            l: 45,
+            l: 15,
             r: 0,
             b: 30,
             t: 0,
@@ -434,14 +523,22 @@ function updatePlotly(myData) {
         },
     };
 
-    var data = [velTrace, accelTrace];
+    // Test Data
+    var velData = [velTrace, accelTrace];
 
-    Plotly.newPlot("gasGraph", data, layout, { responsive: true });
-    Plotly.newPlot("brakeGraph", data, layout, { responsive: true });
-    Plotly.newPlot("accelXGraph", data, layout, { responsive: true });
-    Plotly.newPlot("steeringGraph", data, layout, { responsive: true });
-    Plotly.newPlot("accelYGraph", data, layout, { responsive: true });
-    Plotly.newPlot("velocityGraph", data, layout, { responsive: true });
+    // Real Data
+    var accelYData = [accelYTrace];
+    var accelXData = [accelXTrace];
+    var gasData = [gasTrace];
+    var brakeData = [brakeTrace];
+    var steerData = [steerTrace];
+
+    Plotly.newPlot("velocityGraph", velData, layout, { responsive: true });
+    Plotly.newPlot("accelYGraph", accelYData, layout, { responsive: true });
+    Plotly.newPlot("accelXGraph", accelXData, layout, { responsive: true });
+    Plotly.newPlot("gasGraph", gasData, layout, { responsive: true });
+    Plotly.newPlot("brakeGraph", brakeData, layout, { responsive: true });
+    Plotly.newPlot("steeringGraph", steerData, layout, { responsive: true });
 }
 
 function startStopGraph() {
@@ -453,6 +550,19 @@ function startStopGraph() {
 function resetGraph() {
     myData = getBaseline();
     inSession = false;
+
+    testDataSet = {
+        testEncoder: [0],
+        testIR1: [0],
+        testIR2: [0],
+        testAccelX: [0],
+        testAccelY: [0],
+        testLat: [0],
+        testLon: [0],
+        testVel: [0],
+        testTime: [0],
+    };
+
     updatePlotly(myData);
     console.log("Reset");
 }
