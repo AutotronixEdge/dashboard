@@ -1,15 +1,18 @@
-// Run at Startup
+// Run at startup
 async function startup() {
+    // Setup a timer to periodically (in ms) update the dataset and graphs
     myTimer = setInterval(timerFunction, 1000);
 
+    // Start webpage assuming a session is not in progress
     inSession = false;
 
-    myData = getBaseline();
-    updatePlotly(myData);
+    // Sets up initial graphs
+    updatePlotly();
 
+    // Update dataset and graphs with timer if a session is in progress
     function timerFunction() {
         if (inSession) {
-            updatePlotly(myData);
+            updatePlotly();
         }
     }
 
@@ -18,6 +21,7 @@ async function startup() {
     viewWidth = viewWidth * 0.55 - 60;
     colWidth = viewWidth / 6;
 
+    // Define table columns
     var columnDefs = [
         { headerName: "#", field: "lapNumber", width: 60 },
         { headerName: "Lap Time", field: "lapTime", width: colWidth },
@@ -28,7 +32,7 @@ async function startup() {
         { headerName: "S5", field: "ls5", width: colWidth },
     ];
 
-    // specify the data
+    // Define table row data
     var rowData = [
         { lapNumber: 1, lapTime: 410, ls1: "1:10" },
         { lapNumber: 2, lapTime: 330, ls1: "1:00" },
@@ -42,7 +46,7 @@ async function startup() {
         { lapNumber: 10, lapTime: 340, ls1: "1:10" },
     ];
 
-    // let the grid know which columns and what data to use
+    // Let the grid know which columns and what data to use
     var gridOptions = {
         defaultColDef: {
             resizable: true,
@@ -51,7 +55,7 @@ async function startup() {
         columnDefs: columnDefs,
         rowData: rowData,
     };
-    // setup the grid after the page has finished loading
+    // Setup the grid after the page has finished loading
     document.addEventListener("DOMContentLoaded", function () {
         var gridDiv = document.querySelector("#myGrid");
         new agGrid.Grid(gridDiv, gridOptions);
@@ -68,60 +72,51 @@ async function startup() {
         "Average Lap Time: " + rowDataAvg.toFixed(2) + " s";
     // ----- Table Data -----
     // TABLE STUFF-----------------------------------------------------------------T
-
-    //------------------------------------ html request ------------------------------------H
-    var userName = "dannyharris2";
-    var passWord = "oi6ZeQBvC95NuD1XvR8GJKzxtFZP6n";
-
-    function authenticateUser(user, password) {
-        var token = user + ":" + password;
-        var hash = btoa(token);
-
-        return "Basic " + hash;
-    }
-
-    function CallWebAPI() {
-        // New XMLHTTPRequest
-        var request = new XMLHttpRequest();
-        request.open(
-            "GET",
-            "https://dry-eyrie-70197.herokuapp.com/https://rest.textmagic.com/api/v2/replies",
-            false
-        );
-        request.setRequestHeader(
-            "Authorization",
-            authenticateUser(userName, passWord)
-        );
-        request.send();
-        let testVar = request.response;
-        testVar = JSON.parse(testVar);
-        document.getElementById("map").innerHTML = testVar.resources[0].text;
-    }
-    // CallWebAPI();
-    //------------------------------------ html request ------------------------------------H
 }
 
-//-------------------------------- html request method 2 --------------------------------H
+// Calculates the distance from Lon and Lat data points in a dataset
+function distance(coords) {
+    var degToRad = Math.PI / 180;
+    return (
+        6371000 *
+        degToRad *
+        Math.sqrt(
+            Math.pow(
+                Math.cos(coords.testLat[coords.testLat.length - 2] * degToRad) *
+                    (coords.testLon[coords.testLon.length - 2] -
+                        coords.testLon[coords.testLon.length - 1]),
+                2
+            ) +
+                Math.pow(
+                    coords.testLat[coords.testLat.length - 2] -
+                        coords.testLat[coords.testLat.length - 1],
+                    2
+                )
+        )
+    );
+}
+
+//-------------------------------- Fetch Request --------------------------------H
+// Initialize data related variables
 testData = {};
-
 testDataSet = {
-    testEncoder: [0],
-    testIR1: [0],
-    testIR2: [0],
-    testAccelX: [0],
-    testAccelY: [0],
-    testLat: [0],
-    testLon: [0],
-    testVel: [0],
-    testTime: [0],
+    testEncoder: [],
+    testIR1: [],
+    testIR2: [],
+    testAccelX: [],
+    testAccelY: [],
+    testLat: [],
+    testLon: [],
+    testVel: [],
+    testTime: [],
 };
-
 previousData = "";
 startTime = Date.now();
 currentTime = 0;
 
+// Gets the most recent data points from TextMagic DB
 async function storeData() {
-    // Fetch Data
+    // Fetch data
     async function fetchData() {
         const response = await fetch(
             "https://dry-eyrie-70197.herokuapp.com/https://rest.textmagic.com/api/v2/replies",
@@ -135,21 +130,26 @@ async function storeData() {
         );
         return response.json();
     }
-    // Save Data in Variable
+
+    // Save data in variable
     testData = await fetchData().catch((error) => {
         console.log("error!");
         console.error(error);
     });
 
+    // Split data by commas
     splitTestData = testData.resources[0].text.split(",");
 
+    // Check if data is repeated
     if (
         (!splitTestData.some(isNaN) && previousData != splitTestData) ||
         previousData == ""
     ) {
-        currentTime = Date.now();
-        timeDiff = (currentTime - startTime) / 1000;
+        // Get current session time
+        currentTimeMs = Date.now();
+        currentTime = (currentTimeMs - startTime) / 1000;
 
+        // Add new data to dataset object
         testDataSet.testEncoder.push(splitTestData[0]);
         testDataSet.testIR1.push(splitTestData[1]);
         testDataSet.testIR2.push(splitTestData[2]);
@@ -157,12 +157,27 @@ async function storeData() {
         testDataSet.testAccelY.push(splitTestData[4]);
         testDataSet.testLat.push(splitTestData[5]);
         testDataSet.testLon.push(splitTestData[6]);
-        testDataSet.testTime.push(timeDiff);
 
-        console.log("Current Data Set:");
+        // Calculate the velocity from Lat and Lon points
+        calcVelocity =
+            distance(testDataSet) /
+            (currentTime -
+                testDataSet.testTime[testDataSet.testTime.length - 1]);
+
+        // Check if velocity is calculable (starting velocity value)
+        if (!calcVelocity) {
+            calcVelocity = 0;
+        }
+
+        // Continue adding new data to dataset object
+        testDataSet.testVel.push(calcVelocity.toFixed(2));
+        testDataSet.testTime.push(currentTime);
+
+        // Display updated dataset in console
+        console.log("Current dataset:");
         console.log(testDataSet);
 
-        // Display Latest Data
+        // Display latest data for debugging
         document.getElementById("map").innerHTML =
             "<b>Encoder:</b>" +
             "<br />" +
@@ -192,6 +207,10 @@ async function storeData() {
             "<br />" +
             testDataSet.testLon +
             "<br />" +
+            "<b>Velocity:</b>" +
+            "<br />" +
+            testDataSet.testVel +
+            "<br />" +
             "<b>Time:</b>" +
             "<br />" +
             testDataSet.testTime;
@@ -201,169 +220,17 @@ async function storeData() {
 
     return testDataSet;
 }
-//-------------------------------- html request method 2 --------------------------------H
+//-------------------------------- Fetch Request --------------------------------H
 
-function getBaseline() {
-    function getRandomArbitrary(min, max) {
-        let data = [];
-        let i;
-        for (i = 0; i < 100; i++) {
-            data.push(Math.random() * (max - min) + min);
-        }
-        return data;
-    }
-
-    let accelerationData = getRandomArbitrary(0, 200);
-    xLabels = Array.from({ length: 100 }, (v, k) => k + 1);
-    let velocityData = [
-        1,
-        2,
-        6,
-        8,
-        11,
-        15,
-        18,
-        19,
-        20,
-        25,
-        28,
-        30,
-        32,
-        34,
-        35,
-        36,
-        40,
-        44,
-        45,
-        49,
-        51,
-        58,
-        59,
-        63,
-        64,
-        65,
-        67,
-        68,
-        72,
-        73,
-        81,
-        86,
-        87,
-        88,
-        89,
-        90,
-        93,
-        95,
-        96,
-        105,
-        106,
-        108,
-        109,
-        110,
-        111,
-        112,
-        113,
-        114,
-        115,
-        117,
-        118,
-        120,
-        121,
-        123,
-        124,
-        125,
-        127,
-        128,
-        129,
-        130,
-        134,
-        138,
-        139,
-        140,
-        141,
-        142,
-        145,
-        146,
-        147,
-        151,
-        154,
-        156,
-        158,
-        161,
-        162,
-        164,
-        165,
-        168,
-        170,
-        171,
-        172,
-        173,
-        174,
-        175,
-        176,
-        177,
-        178,
-        179,
-        180,
-        181,
-        184,
-        187,
-        188,
-        189,
-        193,
-        194,
-        195,
-        197,
-        199,
-        200,
-    ];
-
-    let currentTime = [
-        [new Date().getMinutes(), new Date().getSeconds()].join(":"),
-    ];
-
-    return {
-        x: xLabels,
-        y1: velocityData,
-        y2: accelerationData,
-        time: currentTime,
-    };
-}
-
-async function updatePlotly(myData) {
-    //
+// Updates the dataset and related graphs
+async function updatePlotly() {
+    // Get data from TextMagic DB
     receivedData = await storeData();
-    //
 
-    // Generated Data
-    myData.x.push(myData.x[myData.x.length - 1] + 1);
-    myData.y1.push(50 * Math.sin(myData.x[myData.x.length - 1]) + 100);
-    myData.y2.push(100 * Math.cos(myData.x[myData.x.length - 1]) + 100);
-    myData.time.push(
-        [new Date().getMinutes(), new Date().getSeconds()].join(":")
-    );
-
-    // Update Velocity Test Graph
+    // Update graphs
     var velTrace = {
-        x: myData.x,
-        y: myData.y1,
-        mode: "lines+markers",
-        marker: {
-            color: "red",
-            size: 6,
-        },
-        line: {
-            color: "red",
-            width: 2,
-            shape: "spline",
-        },
-        text: "m/s*",
-        name: "Test Velocity",
-    };
-
-    var accelTrace = {
-        x: myData.x,
-        y: myData.y2,
+        x: receivedData.testTime,
+        y: receivedData.testVel,
         mode: "lines+markers",
         marker: {
             color: "cyan",
@@ -374,11 +241,10 @@ async function updatePlotly(myData) {
             width: 2,
             shape: "spline",
         },
-        text: "m/s^2*",
-        name: "Test Acceleration",
+        text: "m/s",
+        name: "Velocity",
     };
 
-    // Update Graphs
     var accelYTrace = {
         x: receivedData.testTime,
         y: receivedData.testAccelY,
@@ -464,6 +330,7 @@ async function updatePlotly(myData) {
         name: "Steering Wheel Rotation",
     };
 
+    // Define graph layout
     var layout = {
         // title: "Vehicle Data Graph",
         xaxis: {
@@ -523,16 +390,15 @@ async function updatePlotly(myData) {
         },
     };
 
-    // Test Data
-    var velData = [velTrace, accelTrace];
-
-    // Real Data
+    // Prepare data for plotting
+    var velData = [velTrace];
     var accelYData = [accelYTrace];
     var accelXData = [accelXTrace];
     var gasData = [gasTrace];
     var brakeData = [brakeTrace];
     var steerData = [steerTrace];
 
+    // Plot data on graphs
     Plotly.newPlot("velocityGraph", velData, layout, { responsive: true });
     Plotly.newPlot("accelYGraph", accelYData, layout, { responsive: true });
     Plotly.newPlot("accelXGraph", accelXData, layout, { responsive: true });
@@ -541,28 +407,29 @@ async function updatePlotly(myData) {
     Plotly.newPlot("steeringGraph", steerData, layout, { responsive: true });
 }
 
+// Starts or stops data collection and graph updates
 function startStopGraph() {
     inSession = !inSession;
     console.log("Start / Stop");
     startTime = Date.now();
 }
 
+// Resets data and graphs
 function resetGraph() {
-    myData = getBaseline();
     inSession = false;
 
     testDataSet = {
-        testEncoder: [0],
-        testIR1: [0],
-        testIR2: [0],
-        testAccelX: [0],
-        testAccelY: [0],
-        testLat: [0],
-        testLon: [0],
-        testVel: [0],
-        testTime: [0],
+        testEncoder: [],
+        testIR1: [],
+        testIR2: [],
+        testAccelX: [],
+        testAccelY: [],
+        testLat: [],
+        testLon: [],
+        testVel: [],
+        testTime: [],
     };
 
-    updatePlotly(myData);
+    updatePlotly();
     console.log("Reset");
 }
