@@ -16,87 +16,6 @@ async function startup() {
             updatePlotly();
         }
     }
-
-    // TABLE STUFF-----------------------------------------------------------------T
-    viewWidth = window.innerWidth;
-    viewWidth = viewWidth * 0.55 - 60;
-    colWidth = viewWidth / 6;
-
-    // Define table columns
-    var columnDefs = [
-        { headerName: "#", field: "lapNumber", width: 60 },
-        { headerName: "Lap Time", field: "lapTime", width: colWidth },
-        { headerName: "S1", field: "ls1", width: colWidth },
-        { headerName: "S2", field: "ls2", width: colWidth },
-        { headerName: "S3", field: "ls3", width: colWidth },
-        { headerName: "S4", field: "ls4", width: colWidth },
-        { headerName: "S5", field: "ls5", width: colWidth },
-    ];
-
-    // Define table row data
-    var rowData = [
-        { lapNumber: 1, lapTime: 410, ls1: "1:10" },
-        { lapNumber: 2, lapTime: 330, ls1: "1:00" },
-        { lapNumber: 3, lapTime: 345, ls1: "1:10" },
-        { lapNumber: 4, lapTime: 345, ls1: "1:10" },
-        { lapNumber: 5, lapTime: 350, ls1: "1:10" },
-        { lapNumber: 6, lapTime: 340, ls1: "1:10" },
-        { lapNumber: 7, lapTime: 340, ls1: "1:10" },
-        { lapNumber: 8, lapTime: 340, ls1: "1:10" },
-        { lapNumber: 9, lapTime: 340, ls1: "1:10" },
-        { lapNumber: 10, lapTime: 340, ls1: "1:10" },
-    ];
-
-    // Let the grid know which columns and what data to use
-    var gridOptions = {
-        defaultColDef: {
-            resizable: true,
-            sortable: true,
-        },
-        columnDefs: columnDefs,
-        rowData: rowData,
-    };
-    // Setup the grid after the page has finished loading
-    document.addEventListener("DOMContentLoaded", function () {
-        var gridDiv = document.querySelector("#myGrid");
-        new agGrid.Grid(gridDiv, gridOptions);
-    });
-
-    // ----- Table Data -----
-    var i;
-    var rowDataSum = 0;
-    var rowDataSet = [];
-    for (i = 0; i < rowData.length; i++) {
-        rowDataSum = rowDataSum + rowData[i].lapTime;
-        rowDataSet.push(rowData[i].lapTime);
-    }
-    rowDataAvg = rowDataSum / rowData.length;
-    rowDataMin = Math.min(...rowDataSet);
-    rowDataMax = Math.max(...rowDataSet);
-
-    document.getElementById("lapTimes").innerHTML =
-        "Average Lap Time: " +
-        rowDataAvg.toFixed(2) +
-        " s" +
-        "<br />" +
-        "Minimum Lap Time: " +
-        rowDataMin.toFixed(2) +
-        " s" +
-        "<br />" +
-        "Maximum Lap Time: " +
-        rowDataMax.toFixed(2) +
-        " s";
-
-    // document.getElementById("map").innerHTML =
-    // "<br>Encoder:</br>" +
-    // "<br />" +
-    // testDataSet.testEncoder +
-    // "<br />" +
-    // "<b>IR 1:</b>" +
-    // "<br />" +
-
-    // ----- Table Data -----
-    // TABLE STUFF-----------------------------------------------------------------T
 }
 
 // Calculates the distance from Lon and Lat data points in a dataset
@@ -456,11 +375,100 @@ async function updatePlotly() {
     for (i = 0; i < exLat.length; i++) {
         var newPoint = document.createElement("div");
         newPoint.className = "track";
+        newPoint.style.backgroundColor =
+            "rgb(" + Math.floor(Math.random() * 255) + ", 168, 0)";
         newPoint.style.left = exLat[i] + "%";
         newPoint.style.bottom = exLon[i] + "%";
         $("#testMap").append(newPoint);
     }
     // TRACK STUFF-----------------------------------------------------------------Tr
+
+    await updateTable();
+}
+
+async function updateTable() {
+    // Clears table to be remade
+    document.getElementById("myGrid").innerHTML = "";
+
+    // TABLE STUFF-----------------------------------------------------------------T
+    viewWidth = window.innerWidth;
+    viewWidth = viewWidth * 0.55 - 60;
+    colWidth = viewWidth / 6;
+
+    // Define table columns
+    columnDefs = [
+        { headerName: "#", field: "lapNumber", width: 60 },
+        { headerName: "Lap Time", field: "lapTime", width: colWidth },
+        { headerName: "S1", field: "ls1", width: colWidth },
+        { headerName: "S2", field: "ls2", width: colWidth },
+        { headerName: "S3", field: "ls3", width: colWidth },
+        { headerName: "S4", field: "ls4", width: colWidth },
+        { headerName: "S5", field: "ls5", width: colWidth },
+    ];
+
+    // Define table row data
+    rowData = [];
+
+    var i;
+    for (i = 0; i < receivedData.testTime.length; i++) {
+        rowData[i] = {
+            lapNumber: i + 1,
+            lapTime:
+                rowData.length == 0
+                    ? receivedData.testTime[i].toFixed(3)
+                    : (
+                          receivedData.testTime[i] -
+                          receivedData.testTime[i - 1]
+                      ).toFixed(3),
+            ls1: "--:--",
+            ls2: "--:--",
+            ls3: "--:--",
+            ls4: "--:--",
+            ls5: "--:--",
+            ls6: "--:--",
+        };
+    }
+
+    // Let the grid know which columns and what data to use
+    gridOptions = {
+        defaultColDef: {
+            resizable: true,
+            sortable: true,
+        },
+        columnDefs: columnDefs,
+        rowData: rowData,
+    };
+
+    // Setup the grid
+    gridDiv = document.querySelector("#myGrid");
+    new agGrid.Grid(gridDiv, gridOptions);
+
+    // ----- Table Data -----
+    var i;
+    rowDataSum = 0;
+    rowDataSet = [];
+    for (i = 0; i < rowData.length; i++) {
+        rowDataSum = rowDataSum + rowData[i].lapTime;
+        rowDataSet.push(rowData[i].lapTime);
+    }
+    rowDataAvg = rowDataSum / rowData.length;
+    rowDataMin = Math.min(...rowDataSet);
+    rowDataMax = Math.max(...rowDataSet);
+
+    document.getElementById("lapTimes").innerHTML =
+        "Average Lap Time: " +
+        rowDataAvg.toFixed(2) +
+        " s" +
+        "<br />" +
+        "Minimum Lap Time: " +
+        rowDataMin.toFixed(2) +
+        " s" +
+        "<br />" +
+        "Maximum Lap Time: " +
+        rowDataMax.toFixed(2) +
+        " s";
+    // ----- Table Data -----
+    // TABLE STUFF-----------------------------------------------------------------T
 }
 
 // Starts or stops data collection and graph updates
