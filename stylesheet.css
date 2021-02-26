@@ -149,16 +149,30 @@ body {
 /* ~~ Track ~~ */
 .map {
     grid-area: map;
+    position: relative;
 }
 
 #map {
 }
 
+#testmap {
+    /* width: 100%;
+    height: 100%; */
+}
+
+.track {
+    background-color: cyan;
+    width: 0.5vw;
+    height: 0.5vw;
+    border-radius: 0.5vw;
+    position: absolute;
+}
+
 #logo {
     position: absolute;
-    width: 15%;
+    width: 50%;
     bottom: 0;
-    right: 5%;
+    right: 25%;
 }
 
 /* ~~ Extra ~~ */
@@ -260,6 +274,10 @@ button {
         text-align: center;
         line-height: 12.5vh;
         font-size: 5vw; /* temporary font */
+    }
+
+    #lapTimes {
+        text-align: right;
     }
 
     #myGrid {

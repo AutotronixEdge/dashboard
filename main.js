@@ -7,7 +7,8 @@ async function startup() {
     inSession = false;
 
     // Sets up initial graphs
-    updatePlotly();
+    // updatePlotly();
+    resetGraph();
 
     // Update dataset and graphs with timer if a session is in progress
     function timerFunction() {
@@ -64,12 +65,36 @@ async function startup() {
     // ----- Table Data -----
     var i;
     var rowDataSum = 0;
+    var rowDataSet = [];
     for (i = 0; i < rowData.length; i++) {
         rowDataSum = rowDataSum + rowData[i].lapTime;
+        rowDataSet.push(rowData[i].lapTime);
     }
     rowDataAvg = rowDataSum / rowData.length;
+    rowDataMin = Math.min(...rowDataSet);
+    rowDataMax = Math.max(...rowDataSet);
+
     document.getElementById("lapTimes").innerHTML =
-        "Average Lap Time: " + rowDataAvg.toFixed(2) + " s";
+        "Average Lap Time: " +
+        rowDataAvg.toFixed(2) +
+        " s" +
+        "<br />" +
+        "Minimum Lap Time: " +
+        rowDataMin.toFixed(2) +
+        " s" +
+        "<br />" +
+        "Maximum Lap Time: " +
+        rowDataMax.toFixed(2) +
+        " s";
+
+    // document.getElementById("map").innerHTML =
+    // "<br>Encoder:</br>" +
+    // "<br />" +
+    // testDataSet.testEncoder +
+    // "<br />" +
+    // "<b>IR 1:</b>" +
+    // "<br />" +
+
     // ----- Table Data -----
     // TABLE STUFF-----------------------------------------------------------------T
 }
@@ -405,6 +430,37 @@ async function updatePlotly() {
     Plotly.newPlot("gasGraph", gasData, layout, { responsive: true });
     Plotly.newPlot("brakeGraph", brakeData, layout, { responsive: true });
     Plotly.newPlot("steeringGraph", steerData, layout, { responsive: true });
+
+    // TRACK STUFF-----------------------------------------------------------------Tr
+    $(".track").remove();
+
+    exLat = [...receivedData.testLat]; //x
+    exLon = [...receivedData.testLon]; //y
+
+    // exLat = exLat2; // Example x data
+    // exLon = exLon2; // Example y data
+
+    exLatMin = Math.min(...exLat);
+    exLonMin = Math.min(...exLon);
+
+    exLat = exLat.map((x) => (x = x - exLatMin));
+    exLon = exLon.map((x) => (x = x - exLonMin));
+
+    exLatMax = Math.max(...exLat);
+    exLonMax = Math.max(...exLon);
+
+    exLat = exLat.map((x) => (x = (x / exLatMax) * 95));
+    exLon = exLon.map((x) => (x = (x / exLonMax) * 75 + 25));
+
+    var i;
+    for (i = 0; i < exLat.length; i++) {
+        var newPoint = document.createElement("div");
+        newPoint.className = "track";
+        newPoint.style.left = exLat[i] + "%";
+        newPoint.style.bottom = exLon[i] + "%";
+        $("#testMap").append(newPoint);
+    }
+    // TRACK STUFF-----------------------------------------------------------------Tr
 }
 
 // Starts or stops data collection and graph updates

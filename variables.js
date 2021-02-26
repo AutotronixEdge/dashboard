@@ -1,5 +1,8 @@
 testVariable = "This is a test";
 
+exLat2 = [0, 1, 2, 1, 0, -1, -2, -1]; //x
+exLon2 = [2, 1, 0, -1, -2, -1, 0, 1]; //y
+
 // <------------------------------> Old HTTP Request Method <------------------------------>
 // var userName = "dannyharris2";
 //     var passWord = "oi6ZeQBvC95NuD1XvR8GJKzxtFZP6n";
