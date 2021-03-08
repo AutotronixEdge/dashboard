@@ -122,42 +122,42 @@ async function storeData() {
         console.log(testDataSet);
 
         // Display latest data for debugging
-        document.getElementById("map").innerHTML =
-            "<b>Encoder:</b>" +
-            "<br />" +
-            testDataSet.testEncoder +
-            "<br />" +
-            "<b>IR 1:</b>" +
-            "<br />" +
-            testDataSet.testIR1 +
-            "<br />" +
-            "<b>IR 2:</b>" +
-            "<br />" +
-            testDataSet.testIR2 +
-            "<br />" +
-            "<b>Accel X:</b>" +
-            "<br />" +
-            testDataSet.testAccelX +
-            "<br />" +
-            "<b>Accel Y:</b>" +
-            "<br />" +
-            testDataSet.testAccelY +
-            "<br />" +
-            "<b>Latitude:</b>" +
-            "<br />" +
-            testDataSet.testLat +
-            "<br />" +
-            "<b>Longitude:</b>" +
-            "<br />" +
-            testDataSet.testLon +
-            "<br />" +
-            "<b>Velocity:</b>" +
-            "<br />" +
-            testDataSet.testVel +
-            "<br />" +
-            "<b>Time:</b>" +
-            "<br />" +
-            testDataSet.testTime;
+        // document.getElementById("map").innerHTML =
+        //     "<b>Encoder:</b>" +
+        //     "<br />" +
+        //     testDataSet.testEncoder +
+        //     "<br />" +
+        //     "<b>IR 1:</b>" +
+        //     "<br />" +
+        //     testDataSet.testIR1 +
+        //     "<br />" +
+        //     "<b>IR 2:</b>" +
+        //     "<br />" +
+        //     testDataSet.testIR2 +
+        //     "<br />" +
+        //     "<b>Accel X:</b>" +
+        //     "<br />" +
+        //     testDataSet.testAccelX +
+        //     "<br />" +
+        //     "<b>Accel Y:</b>" +
+        //     "<br />" +
+        //     testDataSet.testAccelY +
+        //     "<br />" +
+        //     "<b>Latitude:</b>" +
+        //     "<br />" +
+        //     testDataSet.testLat +
+        //     "<br />" +
+        //     "<b>Longitude:</b>" +
+        //     "<br />" +
+        //     testDataSet.testLon +
+        //     "<br />" +
+        //     "<b>Velocity:</b>" +
+        //     "<br />" +
+        //     testDataSet.testVel +
+        //     "<br />" +
+        //     "<b>Time:</b>" +
+        //     "<br />" +
+        //     testDataSet.testTime;
     }
 
     previousData = splitTestData.toString();
@@ -166,10 +166,28 @@ async function storeData() {
 }
 //-------------------------------- Fetch Request --------------------------------H
 
+// Test Demo
+testDataNum = 0;
+
 // Updates the dataset and related graphs
 async function updatePlotly() {
     // Get data from TextMagic DB
     receivedData = await storeData();
+
+    //Test Demo
+    receivedData = receivedDataStatic;
+
+    receivedData.testEncoder.push(addedValues[testDataNum][0]);
+    receivedData.testIR1.push(addedValues[testDataNum][1]);
+    receivedData.testIR2.push(addedValues[testDataNum][2]);
+    receivedData.testAccelX.push(addedValues[testDataNum][3]);
+    receivedData.testAccelY.push(addedValues[testDataNum][4]);
+    receivedData.testLat.push(addedValues[testDataNum][5]);
+    receivedData.testLon.push(addedValues[testDataNum][6]);
+    receivedData.testVel.push(addedValues[testDataNum][7]);
+    receivedData.testTime.push(addedValues[testDataNum][8]);
+
+    testDataNum++;
 
     // Update graphs
     var velTrace = {
@@ -409,17 +427,45 @@ async function updateTable() {
     // Define table row data
     rowData = [];
 
-    var i;
-    for (i = 0; i < receivedData.testTime.length; i++) {
-        rowData[i] = {
-            lapNumber: i + 1,
-            lapTime:
-                rowData.length == 0
-                    ? receivedData.testTime[i].toFixed(3)
-                    : (
-                          receivedData.testTime[i] -
-                          receivedData.testTime[i - 1]
-                      ).toFixed(3),
+    // Test Demo
+    rowData[0] = {
+        lapNumber: 1,
+        lapTime: 250,
+        ls1: "--:--",
+        ls2: "--:--",
+        ls3: "--:--",
+        ls4: "--:--",
+        ls5: "--:--",
+        ls6: "--:--",
+    };
+
+    if (
+        receivedData.testLat[receivedData.testLat.length - 1] ==
+        receivedData.testLat[0]
+    ) {
+        // var i;
+        // for (i = 0; i < receivedData.testTime.length; i++) {
+        //     rowData[i] = {
+        //         lapNumber: i + 1,
+        //         lapTime:
+        //             rowData.length == 0
+        //                 ? receivedData.testTime[i].toFixed(3)
+        //                 : (
+        //                       receivedData.testTime[i] -
+        //                       receivedData.testTime[i - 1]
+        //                   ).toFixed(3),
+        //         ls1: "--:--",
+        //         ls2: "--:--",
+        //         ls3: "--:--",
+        //         ls4: "--:--",
+        //         ls5: "--:--",
+        //         ls6: "--:--",
+        //     };
+        // }
+        // Test Demo
+        rowData[1] = {
+            lapNumber: 2,
+            lapTime: receivedData.testTime[receivedData.testTime.length - 1],
             ls1: "--:--",
             ls2: "--:--",
             ls3: "--:--",
@@ -448,7 +494,7 @@ async function updateTable() {
     rowDataSum = 0;
     rowDataSet = [];
     for (i = 0; i < rowData.length; i++) {
-        rowDataSum = rowDataSum + rowData[i].lapTime;
+        rowDataSum = rowDataSum + parseInt(rowData[i].lapTime); // added parseInt() for testing (not sure if required)
         rowDataSet.push(rowData[i].lapTime);
     }
     rowDataAvg = rowDataSum / rowData.length;
