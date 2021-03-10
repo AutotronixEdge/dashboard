@@ -1,50 +1,23 @@
-testVariable = "This is a test";
+// Variables
+fbUrl = "https://autotronix-test-database-default-rtdb.firebaseio.com/";
+getUrl = "https://dweet.io/get/latest/dweet/for/AutotronixDataTransfer";
+postUrl = "https://dweet.io/dweet/for/AutotronixDataTransfer?";
 
-exLat2 = [0, 1, 2, 1, 0, -1, -2, -1]; //x
-exLon2 = [2, 1, 0, -1, -2, -1, 0, 1]; //y
+dweetDataSet = {
+    accelX: [],
+    accelY: [],
+    brake: [],
+    gas: [],
+    lat: [],
+    lon: [],
+    time: [],
+    vel: [],
+    wheel: [],
+};
 
-rowData2 = [
-    { lapNumber: 1, lapTime: 410, ls1: "1:10" },
-    { lapNumber: 2, lapTime: 330, ls1: "1:00" },
-    { lapNumber: 3, lapTime: 345, ls1: "1:10" },
-    { lapNumber: 4, lapTime: 345, ls1: "1:10" },
-    { lapNumber: 5, lapTime: 350, ls1: "1:10" },
-    { lapNumber: 6, lapTime: 340, ls1: "1:10" },
-    { lapNumber: 7, lapTime: 340, ls1: "1:10" },
-    { lapNumber: 8, lapTime: 340, ls1: "1:10" },
-    { lapNumber: 9, lapTime: 340, ls1: "1:10" },
-    { lapNumber: 10, lapTime: 340, ls1: "1:10" },
-];
+randomString =
+    "30.597757,-96.343714$30.597757,-96.343714$30.597757,-96.343714$30.597750,-96.343709$30.597723,-96.343689$30.597678,-96.343652$30.597619,-96.343602$30.597548,-96.343544$30.597466,-96.343477$30.597374,-96.343401$30.597275,-96.343322$30.597173,-96.343245$30.597071,-96.343170$30.596973,-96.343099$30.596878,-96.343033$30.596788,-96.342974$30.596704,-96.342931$30.596623,-96.342910$30.596541,-96.342913$30.596460,-96.342949$30.596385,-96.343011$30.596317,-96.343090$30.596246,-96.343177$30.596174,-96.343265$30.596104,-96.343345$30.596036,-96.343407$30.595965,-96.343444$30.595898,-96.343447$30.595847,-96.343413$30.595824,-96.343351$30.595837,-96.343283$30.595870,-96.343216$30.595922,-96.343150$30.595986,-96.343078$30.596060,-96.343000$30.596139,-96.342918$30.596224,-96.342835$30.596319,-96.342757$30.596423,-96.342692$30.596534,-96.342653$30.596647,-96.342648$30.596759,-96.342675$30.596869,-96.342727$30.596980,-96.342792$30.597091,-96.342866$30.597204,-96.342950$30.597317,-96.343037$30.597429,-96.343127$30.597539,-96.343217$30.597640,-96.343302$30.597733,-96.343382$30.597814,-96.343457$30.597878,-96.343529$30.597911,-96.343607$30.597902,-96.343680$30.597859,-96.343727$30.597810,-96.343737$30.597774,-96.343725";
+latLon = randomString.split("$");
 
-// <------------------------------> Old HTTP Request Method <------------------------------>
-// var userName = "dannyharris2";
-//     var passWord = "oi6ZeQBvC95NuD1XvR8GJKzxtFZP6n";
-
-//     function authenticateUser(user, password) {
-//         var token = user + ":" + password;
-//         var hash = btoa(token);
-
-//         return "Basic " + hash;
-//     }
-
-//     function CallWebAPI() {
-//         // New XMLHTTPRequest
-//         var request = new XMLHttpRequest();
-//         request.open(
-//             "GET",
-//             "https://dry-eyrie-70197.herokuapp.com/https://rest.textmagic.com/api/v2/replies",
-//             false
-//         );
-//         request.setRequestHeader(
-//             "Authorization",
-//             authenticateUser(userName, passWord)
-//         );
-//         request.send();
-//         let testVar = request.response;
-//         testVar = JSON.parse(testVar);
-//         document.getElementById("map").innerHTML = testVar.resources[0].text;
-//     }
-//     CallWebAPI();
-
-// <------------------------------> Original Velocity Equation <------------------------------>
-// return 6371000 * degToRad * Math.sqrt(Math.pow(Math.cos(point1.lat * degToRad ) * (point1.lng - point2.lng) , 2) + Math.pow(point1.lat - point2.lat, 2));
+let exampleDweetPost =
+    "https://dweet.io/dweet/for/AutotronixDataTransfer?time1=accelX1,accelY1,brake1,gas1,lat1,lon1,time1,wheel1&time2=...";

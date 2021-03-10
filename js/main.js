@@ -1,166 +1,60 @@
 // Run at startup
 async function startup() {
     // Setup a timer to periodically (in ms) update the dataset and graphs
-    myTimer = setInterval(timerFunction, 1000);
-
-    // Start webpage assuming a session is not in progress
-    inSession = false;
+    myTimer = setInterval(timerFunction, 3000);
 
     // Setup event listeners
     document
         .querySelector("#startStopBtn")
-        .addEventListener("click", startStopGraph);
-    document.querySelector("#resetBtn").addEventListener("click", resetGraph);
+        .addEventListener("click", startStop);
+    document.querySelector("#resetBtn").addEventListener("click", reset);
     document
         .querySelector("#downloadBtn")
         .addEventListener("click", downloadData);
 
-    // Sets up initial graphs
-    // updatePlotly();
-    resetGraph();
+    // TESTING
+    document
+        .querySelector("#flushBtn")
+        .addEventListener("click", flushDatabase);
 
-    // Update dataset and graphs with timer if a session is in progress
+    // Initial reset
+    reset();
+
     function timerFunction() {
-        if (inSession) {
-            updatePlotly();
+        if (inSession == true) {
+            refresh();
         }
     }
 }
 
-// Calculates the distance from Lon and Lat data points in a dataset
-function distance(coords) {
-    var degToRad = Math.PI / 180;
-    return (
-        6371000 *
-        degToRad *
-        Math.sqrt(
-            Math.pow(
-                Math.cos(coords.testLat[coords.testLat.length - 2] * degToRad) *
-                    (coords.testLon[coords.testLon.length - 2] -
-                        coords.testLon[coords.testLon.length - 1]),
-                2
-            ) +
-                Math.pow(
-                    coords.testLat[coords.testLat.length - 2] -
-                        coords.testLat[coords.testLat.length - 1],
-                    2
-                )
-        )
-    );
+// Main loop to get and display data
+async function refresh() {
+    // Get dweet data
+    dweetData = await getDweet(getUrl);
+    dweetContent = dweetData.with[0].content;
+    let isNewData = extractDweet(dweetContent);
+
+    // Update if new data
+    if (isNewData) {
+        updateGraphs(dweetDataSet);
+        updateTable(dweetDataSet);
+        updateTrack(dweetDataSet);
+    }
+
+    // extract data (function)------------------------------------------------------
+    //     if data is new (function)
+    //         check lap number (function)
+    //         update graphs (function)
+    //         update track (function)
+    //         if new lap
+    //             update table (function)
 }
 
-//-------------------------------- Fetch Request --------------------------------H
-// Initialize data related variables
-testData = {};
-testDataSet = {
-    testEncoder: [],
-    testIR1: [],
-    testIR2: [],
-    testAccelX: [],
-    testAccelY: [],
-    testLat: [],
-    testLon: [],
-    testVel: [],
-    testTime: [],
-};
-
-previousData = "";
-startTime = Date.now();
-currentTime = 0;
-
-// Gets the most recent data points from TextMagic DB
-async function storeData() {
-    // Fetch data
-    async function fetchData() {
-        const response = await fetch(
-            "https://dry-eyrie-70197.herokuapp.com/https://rest.textmagic.com/api/v2/replies",
-            {
-                headers: {
-                    Authorization:
-                        "Basic " +
-                        btoa("dannyharris2:oi6ZeQBvC95NuD1XvR8GJKzxtFZP6n"),
-                },
-            }
-        );
-        return response.json();
-    }
-
-    // Save data in variable
-    testData = await fetchData().catch((error) => {
-        console.log("error!");
-        console.error(error);
-    });
-
-    // Split data by commas
-    splitTestData = testData.resources[0].text.split(",");
-
-    // Check if data is repeated
-    if (
-        (!splitTestData.some(isNaN) && previousData != splitTestData) ||
-        previousData == ""
-    ) {
-        // Get current session time
-        currentTimeMs = Date.now();
-        currentTime = (currentTimeMs - startTime) / 1000;
-
-        // Add new data to dataset object
-        testDataSet.testEncoder.push(splitTestData[0]);
-        testDataSet.testIR1.push(splitTestData[1]);
-        testDataSet.testIR2.push(splitTestData[2]);
-        testDataSet.testAccelX.push(splitTestData[3]);
-        testDataSet.testAccelY.push(splitTestData[4]);
-        testDataSet.testLat.push(splitTestData[5]);
-        testDataSet.testLon.push(splitTestData[6]);
-
-        // Calculate the velocity from Lat and Lon points
-        calcVelocity =
-            distance(testDataSet) /
-            (currentTime -
-                testDataSet.testTime[testDataSet.testTime.length - 1]);
-
-        // Check if velocity is calculable (starting velocity value)
-        if (!calcVelocity) {
-            calcVelocity = 0;
-        }
-
-        // Continue adding new data to dataset object
-        testDataSet.testVel.push(calcVelocity.toFixed(2));
-        testDataSet.testTime.push(currentTime);
-
-        // Display updated dataset in console
-        console.log("Current dataset:", testDataSet);
-    }
-
-    previousData = splitTestData.toString();
-
-    // Testing
-    let isDbEmpty = await getData(fbUrl, "Dataset Status");
-    if (isDbEmpty != "empty") {
-        dweetDataSet = await getData(fbUrl, "Dataset");
-        testDataSet.testEncoder = dweetDataSet.wheel;
-        testDataSet.testIR1 = dweetDataSet.gas;
-        testDataSet.testIR2 = dweetDataSet.brake;
-        testDataSet.testAccelX = dweetDataSet.accelX;
-        testDataSet.testAccelY = dweetDataSet.accelY;
-        testDataSet.testLat = dweetDataSet.lat;
-        testDataSet.testLon = dweetDataSet.lon;
-        testDataSet.testVel = dweetDataSet.vel;
-        testDataSet.testTime = dweetDataSet.time;
-    }
-
-    return testDataSet;
-}
-//-------------------------------- Fetch Request --------------------------------H
-
-// Updates the dataset and related graphs
-async function updatePlotly() {
-    // Get data from TextMagic DB
-    receivedData = await storeData();
-
-    // Update graphs
+// Updates graphs
+function updateGraphs(data) {
     var velTrace = {
-        x: receivedData.testTime,
-        y: receivedData.testVel,
+        x: data.time,
+        y: data.vel,
         mode: "lines+markers",
         marker: {
             color: "cyan",
@@ -176,8 +70,8 @@ async function updatePlotly() {
     };
 
     var accelYTrace = {
-        x: receivedData.testTime,
-        y: receivedData.testAccelY,
+        x: data.time,
+        y: data.accelY,
         mode: "lines+markers",
         marker: {
             color: "cyan",
@@ -193,8 +87,8 @@ async function updatePlotly() {
     };
 
     var accelXTrace = {
-        x: receivedData.testTime,
-        y: receivedData.testAccelX,
+        x: data.time,
+        y: data.accelX,
         mode: "lines+markers",
         marker: {
             color: "cyan",
@@ -210,8 +104,8 @@ async function updatePlotly() {
     };
 
     var gasTrace = {
-        x: receivedData.testTime,
-        y: receivedData.testIR1,
+        x: data.time,
+        y: data.gas,
         mode: "lines+markers",
         marker: {
             color: "cyan",
@@ -227,8 +121,8 @@ async function updatePlotly() {
     };
 
     var brakeTrace = {
-        x: receivedData.testTime,
-        y: receivedData.testIR2,
+        x: data.time,
+        y: data.brake,
         mode: "lines+markers",
         marker: {
             color: "cyan",
@@ -244,8 +138,8 @@ async function updatePlotly() {
     };
 
     var steerTrace = {
-        x: receivedData.testTime,
-        y: receivedData.testEncoder,
+        x: data.time,
+        y: data.wheel,
         mode: "lines+markers",
         marker: {
             color: "cyan",
@@ -335,44 +229,10 @@ async function updatePlotly() {
     Plotly.newPlot("gasGraph", gasData, layout, { responsive: true });
     Plotly.newPlot("brakeGraph", brakeData, layout, { responsive: true });
     Plotly.newPlot("steeringGraph", steerData, layout, { responsive: true });
-
-    // TRACK STUFF-----------------------------------------------------------------Tr
-    $(".track").remove();
-
-    exLat = [...receivedData.testLat]; //x
-    exLon = [...receivedData.testLon]; //y
-
-    // exLat = exLat2; // Example x data
-    // exLon = exLon2; // Example y data
-
-    exLatMin = Math.min(...exLat);
-    exLonMin = Math.min(...exLon);
-
-    exLat = exLat.map((x) => (x = x - exLatMin));
-    exLon = exLon.map((x) => (x = x - exLonMin));
-
-    exLatMax = Math.max(...exLat);
-    exLonMax = Math.max(...exLon);
-
-    exLat = exLat.map((x) => (x = (x / exLatMax) * 95));
-    exLon = exLon.map((x) => (x = (x / exLonMax) * 75 + 25));
-
-    var i;
-    for (i = 0; i < exLat.length; i++) {
-        var newPoint = document.createElement("div");
-        newPoint.className = "track";
-        newPoint.style.backgroundColor =
-            "rgb(" + Math.floor(Math.random() * 255) + ", 168, 0)";
-        newPoint.style.left = exLat[i] + "%";
-        newPoint.style.bottom = exLon[i] + "%";
-        $("#testMap").append(newPoint);
-    }
-    // TRACK STUFF-----------------------------------------------------------------Tr
-
-    await updateTable();
 }
 
-async function updateTable() {
+// Updates the lap time table and calculations
+function updateTable(data) {
     // Clears table to be remade
     document.getElementById("myGrid").innerHTML = "";
 
@@ -395,20 +255,14 @@ async function updateTable() {
     // Define table row data
     rowData = [];
 
-    // Testing
-    receivedData = testDataSet;
-
     var i;
-    for (i = 0; i < receivedData.testTime.length; i++) {
+    for (i = 0; i < data.time.length; i++) {
         rowData[i] = {
             lapNumber: i + 1,
             lapTime:
                 rowData.length == 0
-                    ? receivedData.testTime[i]
-                    : (
-                          receivedData.testTime[i] -
-                          receivedData.testTime[i - 1]
-                      ).toFixed(3),
+                    ? data.time[i]
+                    : (data.time[i] - data.time[i - 1]).toFixed(3),
             ls1: "--:--",
             ls2: "--:--",
             ls3: "--:--",
@@ -460,33 +314,232 @@ async function updateTable() {
     // TABLE STUFF-----------------------------------------------------------------T
 }
 
-// Starts or stops data collection and graph updates
-function startStopGraph() {
-    inSession = !inSession;
-    console.log("Start / Stop");
-    startTime = Date.now();
+// Updates the track
+function updateTrack(data) {
+    $(".track").remove();
+
+    exLat = [...data.lat]; //x
+    exLon = [...data.lon]; //y
+
+    // exLat = exLat2; // Example x data
+    // exLon = exLon2; // Example y data
+
+    exLatMin = Math.min(...exLat);
+    exLonMin = Math.min(...exLon);
+
+    exLat = exLat.map((x) => (x = x - exLatMin));
+    exLon = exLon.map((x) => (x = x - exLonMin));
+
+    exLatMax = Math.max(...exLat);
+    exLonMax = Math.max(...exLon);
+
+    exLat = exLat.map((x) => (x = (x / exLatMax) * 95));
+    exLon = exLon.map((x) => (x = (x / exLonMax) * 35 + 45));
+
+    color = "";
+    for (let i = 0; i < exLat.length; i++) {
+        var newPoint = document.createElement("div");
+        newPoint.className = "track";
+
+        // Set velocity color
+        if (data.vel[i] < 20 || !data.vel[i]) {
+            color = "#f54242";
+        } else if (data.vel[i] < 20) {
+            color = "#ffb300";
+        } else if (data.vel[i] < 40) {
+            color = "#fff700";
+        } else if (data.vel[i] < 60) {
+            color = "#bbff00";
+        } else if (data.vel[i] < 80) {
+            color = "#99ff00";
+        } else if (data.vel[i] < 100) {
+            color = "#f54242";
+        } else {
+            color = "#27ff00";
+        }
+
+        newPoint.style.backgroundColor = color;
+        newPoint.style.left = exLat[i] + "%";
+        newPoint.style.bottom = exLon[i] + "%";
+        $("#mapArea").append(newPoint);
+    }
 }
 
-// Resets data and graphs
-function resetGraph() {
+// Starts or stops data collection / presentation
+function startStop(e) {
+    let stopBtn = e.target;
+    if (inSession == false) {
+        stopBtn.classList.remove("green");
+        stopBtn.classList.add("orange");
+        inSession = true;
+        stopBtn.innerHTML = "stop";
+
+        console.log("Start");
+    } else {
+        stopBtn.classList.remove("orange");
+        stopBtn.classList.add("green");
+        inSession = false;
+        stopBtn.innerHTML = "start";
+
+        console.log("Stop");
+    }
+}
+
+// Reset data and graphs
+function reset(e) {
     inSession = false;
 
-    testDataSet = {
-        testEncoder: [],
-        testIR1: [],
-        testIR2: [],
-        testAccelX: [],
-        testAccelY: [],
-        testLat: [],
-        testLon: [],
-        testVel: [],
-        testTime: [],
+    // Reset data
+    dweetDataSet = {
+        accelX: [],
+        accelY: [],
+        brake: [],
+        gas: [],
+        lat: [],
+        lon: [],
+        time: [],
+        vel: [],
+        wheel: [],
     };
 
-    updatePlotly();
+    // TESTING---------------------------------------------------
+    // runTestCode();
+    // dweetRandomData()
+
+    // Reset graphs
+    updateGraphs(dweetDataSet);
+
+    // Reset table----------------------------------------------------------------------
+    updateTable(dweetDataSet);
+
+    // Reset track
+    updateTrack(dweetDataSet);
+
+    // Generate new session id
+    sessionId = "session" + new Date().getTime();
+
+    // Reset start/stop button
+    let stopBtn = document.querySelector("#startStopBtn");
+    stopBtn.classList.remove("orange");
+    stopBtn.classList.add("green");
+    stopBtn.innerHTML = "start";
+
     console.log("Reset");
 }
 
+// Download current session as CSV
 function downloadData() {
+    // download data --------------------------------------------------
     console.log("Downloaded Data");
+}
+
+// Gets data from database
+async function getData(url, item) {
+    const response = await fetch(url + item + ".json");
+    return response.json();
+}
+
+// Updates database
+async function patchData(url, item, name, value) {
+    data = { [name]: value };
+    const response = await fetch(url + item + ".json", {
+        method: "PATCH",
+        body: JSON.stringify(data),
+    });
+}
+
+// Deletes data from database
+async function deleteData(url, item = "", name = "") {
+    // data = { [name]: value };
+    const response = await fetch(url + item + "/" + name + ".json", {
+        method: "DELETE",
+    });
+}
+
+// Gets latest dweet content
+async function getDweet(url = "") {
+    const response = await fetch(url);
+    return response.json();
+}
+
+// Posts data to dweet
+async function postDweet(url = "", postData = "") {
+    const response = await fetch(url + postData);
+    return response.json();
+}
+
+// Gets data from latest dweet and updates current dataset
+function extractDweet(dweet) {
+    // Add dweet content to dataset if not a repeat
+    if (!dweetDataSet.time.includes(Object.keys(dweet)[0])) {
+        for (var prop in dweet) {
+            let propData = dweet[prop].split(",");
+
+            // store dataset values
+            dweetDataSet.wheel.push(propData[0]);
+            dweetDataSet.gas.push(propData[1]);
+            dweetDataSet.brake.push(propData[2]);
+            dweetDataSet.accelX.push(propData[3]);
+            dweetDataSet.accelY.push(propData[4]);
+            dweetDataSet.lat.push(propData[5]);
+            dweetDataSet.lon.push(propData[6]);
+            dweetDataSet.time.push(prop);
+
+            // calc and store velocity
+            let velocity = calcVel();
+            dweetDataSet.vel.push(velocity.toFixed(2));
+        }
+        patchData(fbUrl, "", "Dataset/" + sessionId, dweetDataSet);
+
+        console.log("New Data Received");
+
+        return true;
+    } else {
+        console.log("Repeat Data Received");
+
+        return false;
+    }
+}
+
+// Calculate the velocity from Lat and Lon points
+function calcVel() {
+    let velocity =
+        getDistance(dweetDataSet) /
+        (dweetDataSet.time[dweetDataSet.time.length - 2] -
+            dweetDataSet.time[dweetDataSet.time.length - 1]);
+
+    // Check if velocity is calculable (starting velocity value)
+    if (!velocity) {
+        velocity = 0;
+    }
+    return velocity;
+}
+
+// Calculates the distance from Lon and Lat data points in a dataset
+function getDistance(coords) {
+    var degToRad = Math.PI / 180;
+
+    // console.log("length", coords.lat.length);
+    let distance =
+        6371000 *
+        degToRad *
+        Math.sqrt(
+            Math.pow(
+                Math.cos(coords.lat[coords.lat.length - 2] * degToRad) *
+                    (coords.lon[coords.lon.length - 2] -
+                        coords.lon[coords.lon.length - 1]),
+                2
+            ) +
+                Math.pow(
+                    coords.lat[coords.lat.length - 2] -
+                        coords.lat[coords.lat.length - 1],
+                    2
+                )
+        );
+    return distance;
+}
+
+function flushDatabase() {
+    deleteData(fbUrl, "Dataset");
+    console.log("Flushed Database");
 }

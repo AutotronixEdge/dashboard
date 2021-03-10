@@ -66,11 +66,11 @@
         <!-- Buttons -->
         <div class="buttons">
             <div class="row">
-                <div class="col">
+                <div class="col" id="testId">
                     <a
                         id="startStopBtn"
                         class="btn-small green darken-4 hoverable"
-                        >start/stop</a
+                        >start</a
                     >
                 </div>
                 <div class="col">
@@ -85,25 +85,20 @@
                         >download</a
                     >
                 </div>
-            </div>
 
-            <!-- <input
-                id="startStopButton"
-                type="button"
-                value="Start / Stop"
-                onclick="startStopGraph()"
-            />
-            <input
-                id="resetButton"
-                type="button"
-                value="Reset"
-                onclick="resetGraph()"
-            /> -->
+                <!-- TESTING -->
+                <div class="row"></div>
+                <div class="col">
+                    <a class="btn-small blue-grey hoverable" id="flushBtn"
+                        >flush database</a
+                    >
+                </div>
+            </div>
         </div>
 
         <!-- Track -->
         <div class="map">
-            <div id="testMap">
+            <div id="mapArea">
                 <div id="map"></div>
             </div>
             <img id="logo" src="autotronixLogoOpaque.png" />
