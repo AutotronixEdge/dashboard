@@ -6,6 +6,15 @@ async function startup() {
     // Start webpage assuming a session is not in progress
     inSession = false;
 
+    // Setup event listeners
+    document
+        .querySelector("#startStopBtn")
+        .addEventListener("click", startStopGraph);
+    document.querySelector("#resetBtn").addEventListener("click", resetGraph);
+    document
+        .querySelector("#downloadBtn")
+        .addEventListener("click", downloadData);
+
     // Sets up initial graphs
     // updatePlotly();
     resetGraph();
@@ -54,6 +63,7 @@ testDataSet = {
     testVel: [],
     testTime: [],
 };
+
 previousData = "";
 startTime = Date.now();
 currentTime = 0;
@@ -118,49 +128,25 @@ async function storeData() {
         testDataSet.testTime.push(currentTime);
 
         // Display updated dataset in console
-        console.log("Current dataset:");
-        console.log(testDataSet);
-
-        // Display latest data for debugging
-        document.getElementById("map").innerHTML =
-            "<b>Encoder:</b>" +
-            "<br />" +
-            testDataSet.testEncoder +
-            "<br />" +
-            "<b>IR 1:</b>" +
-            "<br />" +
-            testDataSet.testIR1 +
-            "<br />" +
-            "<b>IR 2:</b>" +
-            "<br />" +
-            testDataSet.testIR2 +
-            "<br />" +
-            "<b>Accel X:</b>" +
-            "<br />" +
-            testDataSet.testAccelX +
-            "<br />" +
-            "<b>Accel Y:</b>" +
-            "<br />" +
-            testDataSet.testAccelY +
-            "<br />" +
-            "<b>Latitude:</b>" +
-            "<br />" +
-            testDataSet.testLat +
-            "<br />" +
-            "<b>Longitude:</b>" +
-            "<br />" +
-            testDataSet.testLon +
-            "<br />" +
-            "<b>Velocity:</b>" +
-            "<br />" +
-            testDataSet.testVel +
-            "<br />" +
-            "<b>Time:</b>" +
-            "<br />" +
-            testDataSet.testTime;
+        console.log("Current dataset:", testDataSet);
     }
 
     previousData = splitTestData.toString();
+
+    // Testing
+    let isDbEmpty = await getData(fbUrl, "Dataset Status");
+    if (isDbEmpty != "empty") {
+        dweetDataSet = await getData(fbUrl, "Dataset");
+        testDataSet.testEncoder = dweetDataSet.wheel;
+        testDataSet.testIR1 = dweetDataSet.gas;
+        testDataSet.testIR2 = dweetDataSet.brake;
+        testDataSet.testAccelX = dweetDataSet.accelX;
+        testDataSet.testAccelY = dweetDataSet.accelY;
+        testDataSet.testLat = dweetDataSet.lat;
+        testDataSet.testLon = dweetDataSet.lon;
+        testDataSet.testVel = dweetDataSet.vel;
+        testDataSet.testTime = dweetDataSet.time;
+    }
 
     return testDataSet;
 }
@@ -409,13 +395,16 @@ async function updateTable() {
     // Define table row data
     rowData = [];
 
+    // Testing
+    receivedData = testDataSet;
+
     var i;
     for (i = 0; i < receivedData.testTime.length; i++) {
         rowData[i] = {
             lapNumber: i + 1,
             lapTime:
                 rowData.length == 0
-                    ? receivedData.testTime[i].toFixed(3)
+                    ? receivedData.testTime[i]
                     : (
                           receivedData.testTime[i] -
                           receivedData.testTime[i - 1]
@@ -448,7 +437,7 @@ async function updateTable() {
     rowDataSum = 0;
     rowDataSet = [];
     for (i = 0; i < rowData.length; i++) {
-        rowDataSum = rowDataSum + rowData[i].lapTime;
+        rowDataSum = rowDataSum + parseInt(rowData[i].lapTime);
         rowDataSet.push(rowData[i].lapTime);
     }
     rowDataAvg = rowDataSum / rowData.length;
@@ -496,4 +485,8 @@ function resetGraph() {
 
     updatePlotly();
     console.log("Reset");
+}
+
+function downloadData() {
+    console.log("Downloaded Data");
 }

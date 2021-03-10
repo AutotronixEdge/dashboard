@@ -6,12 +6,24 @@
         <title>Autotronix Dashboard</title>
 
         <!-- Local Files -->
+        <!-- Media -->
         <link rel="icon" href="autotronixLogoLetter.png" />
-        <link rel="stylesheet" href="stylesheet.css" />
-        <script src="main.js"></script>
-        <script src="variables.js"></script>
+        <!-- CSS -->
+        <link rel="stylesheet" href="css/stylesheet.css" />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="css/materialize.min.css"
+            media="screen,projection"
+        />
+        <!-- JS -->
+        <script src="js/main.js"></script>
+        <script src="js/variables.js"></script>
+        <script src="js/testFunctions.js"></script>
 
-        <!-- Online JS -->
+        <!-- Online Files -->
+        <!-- JS -->
+        <!-- jQuery -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
         <!-- Graphing -->
@@ -53,7 +65,29 @@
 
         <!-- Buttons -->
         <div class="buttons">
-            <input
+            <div class="row">
+                <div class="col">
+                    <a
+                        id="startStopBtn"
+                        class="btn-small green darken-4 hoverable"
+                        >start/stop</a
+                    >
+                </div>
+                <div class="col">
+                    <a id="resetBtn" class="btn-small red darken-4 hoverable"
+                        >reset</a
+                    >
+                </div>
+                <div class="col">
+                    <a
+                        class="btn-small blue darken-4 hoverable"
+                        id="downloadBtn"
+                        >download</a
+                    >
+                </div>
+            </div>
+
+            <!-- <input
                 id="startStopButton"
                 type="button"
                 value="Start / Stop"
@@ -64,7 +98,7 @@
                 type="button"
                 value="Reset"
                 onclick="resetGraph()"
-            />
+            /> -->
         </div>
 
         <!-- Track -->
