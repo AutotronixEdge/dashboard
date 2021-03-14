@@ -115,14 +115,21 @@ function reset(e) {
 }
 
 // Download current session as CSV
-function downloadData() {
-    // download data --------------------------------------------------
+function downloadData(e) {
+    let dlBtn = e.target;
+    let dataStr =
+        "data:text/json;charset=utf-8," +
+        encodeURIComponent(JSON.stringify(dweetDataSet));
+    dlBtn.setAttribute("href", dataStr);
+    dlBtn.setAttribute("download", sessionId + ".json");
+
     console.log("Downloaded Data");
 }
 
 // Deletes all data from database
 function flushDatabase() {
     deleteData(fbUrl, "Dataset");
+
     console.log("Flushed Database");
 }
 
@@ -462,6 +469,7 @@ function newLap(newData) {
             isNewLap = true;
             lapData.time.push(dweetDataSet.time[dweetDataSet.time.length - 1]);
             updateTable(lapData);
+
             console.log("New Lap at", i, "of", newLat, "and", newLon);
         }
     }
@@ -537,7 +545,6 @@ async function postDweet(url = "", postData = "") {
 function getDistance(coords) {
     var degToRad = Math.PI / 180;
 
-    // console.log("length", coords.lat.length);
     let distance =
         6371000 *
         degToRad *
