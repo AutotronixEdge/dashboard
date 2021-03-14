@@ -6,16 +6,14 @@ function randomDweet() {
     max3 = 10;
     max4 = 10;
     max5 = 10;
-    max6 = 10;
-    max7 = 10;
+    max6 = 30;
+    max7 = 20;
 
     let dataString = "";
     let currentTime = new Date().getTime();
 
     for (let i = 0; i < 50; i++) {
         // ?time1=d1,d2,d3,d4,d5,d6,d7&time2=...
-        // let delayres = delay(10);
-        // currentTime += Math.floor(Math.random() * Math.floor(5));
         currentTime += 100;
         let tempString =
             currentTime +

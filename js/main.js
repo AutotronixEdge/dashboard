@@ -37,7 +37,9 @@ async function refresh() {
     // Update if new data
     if (isNewData) {
         updateGraphs(dweetDataSet);
-        updateTable(dweetDataSet);
+        if (lapData.isNewLap) {
+            // updateTable(lapData);
+        }
         updateTrack(dweetDataSet);
     }
 
@@ -48,6 +50,80 @@ async function refresh() {
     //         update track (function)
     //         if new lap
     //             update table (function)
+}
+
+// Starts or stops data collection / presentation
+function startStop(e) {
+    let stopBtn = e.target;
+    if (inSession == false) {
+        stopBtn.classList.remove("green");
+        stopBtn.classList.add("orange");
+        inSession = true;
+        stopBtn.innerHTML = "stop";
+
+        console.log("Start");
+    } else {
+        stopBtn.classList.remove("orange");
+        stopBtn.classList.add("green");
+        inSession = false;
+        stopBtn.innerHTML = "start";
+
+        console.log("Stop");
+    }
+}
+
+// Reset data and graphs
+function reset(e) {
+    inSession = false;
+
+    // Reset data
+    dweetDataSet = {
+        accelX: [],
+        accelY: [],
+        brake: [],
+        gas: [],
+        lat: [],
+        lon: [],
+        time: [],
+        vel: [],
+        wheel: [],
+    };
+
+    // TESTING---------------------------------------------------
+    runTestCode();
+    dweetRandomData();
+
+    // Reset graphs
+    updateGraphs(dweetDataSet);
+
+    // Reset table----------------------------------------------------------------------
+    updateTable(dweetDataSet);
+
+    // Reset track
+    updateTrack(dweetDataSet);
+
+    // Generate new session id
+    sessionId = "session" + new Date().getTime();
+
+    // Reset start/stop button
+    let stopBtn = document.querySelector("#startStopBtn");
+    stopBtn.classList.remove("orange");
+    stopBtn.classList.add("green");
+    stopBtn.innerHTML = "start";
+
+    console.log("Reset");
+}
+
+// Download current session as CSV
+function downloadData() {
+    // download data --------------------------------------------------
+    console.log("Downloaded Data");
+}
+
+// Deletes all data from database
+function flushDatabase() {
+    deleteData(fbUrl, "Dataset");
+    console.log("Flushed Database");
 }
 
 // Updates graphs
@@ -231,6 +307,66 @@ function updateGraphs(data) {
     Plotly.newPlot("steeringGraph", steerData, layout, { responsive: true });
 }
 
+// Updates the track
+function updateTrack(data) {
+    $(".track").remove();
+
+    exLat = [...data.lat]; //x
+    exLon = [...data.lon]; //y
+
+    exLatMin = Math.min(...exLat);
+    exLonMin = Math.min(...exLon);
+
+    exLat = exLat.map((x) => (x = x - exLatMin));
+    exLon = exLon.map((x) => (x = x - exLonMin));
+
+    exLatMax = Math.max(...exLat);
+    exLonMax = Math.max(...exLon);
+
+    exLat = exLat.map((x) => (x = (x / exLatMax) * 90 + 5));
+    exLon = exLon.map((x) => (x = (x / exLonMax) * 80 + 5));
+
+    color = "";
+    for (let i = 0; i < exLat.length; i++) {
+        var newPoint = document.createElement("div");
+        newPoint.className = "track";
+
+        // Set velocity color
+        if (data.vel[i] < 20 || !data.vel[i]) {
+            color = "#f54242";
+        } else if (data.vel[i] < 20) {
+            color = "#ffb300";
+        } else if (data.vel[i] < 40) {
+            color = "#fff700";
+        } else if (data.vel[i] < 60) {
+            color = "#bbff00";
+        } else if (data.vel[i] < 80) {
+            color = "#99ff00";
+        } else if (data.vel[i] < 100) {
+            color = "#f54242";
+        } else {
+            color = "#27ff00";
+        }
+
+        newPoint.style.backgroundColor = color;
+        newPoint.style.left = exLat[i] + "%";
+        newPoint.style.bottom = exLon[i] + "%";
+        document.querySelector("#mapArea").append(newPoint);
+    }
+
+    // TESTING first/current track point
+    if (inSession) {
+        let testElement = document.querySelector("#mapArea").firstElementChild;
+        testElement.style.backgroundColor = "magenta";
+        testElement.style.width = "1em";
+        testElement.style.height = "1em";
+        let testElement2 = document.querySelector("#mapArea").lastElementChild;
+        testElement2.style.backgroundColor = "cyan";
+        testElement2.style.width = "1em";
+        testElement2.style.height = "1em";
+    }
+}
+
 // Updates the lap time table and calculations
 function updateTable(data) {
     // Clears table to be remade
@@ -314,191 +450,26 @@ function updateTable(data) {
     // TABLE STUFF-----------------------------------------------------------------T
 }
 
-// Updates the track
-function updateTrack(data) {
-    $(".track").remove();
+// Checks if a new lap has started and updates lap data
+function newLap(newData) {
+    let newLat = newData[5];
+    let newLon = newData[6];
 
-    exLat = [...data.lat]; //x
-    exLon = [...data.lon]; //y
+    let isNewLap = false;
 
-    // exLat = exLat2; // Example x data
-    // exLon = exLon2; // Example y data
-
-    exLatMin = Math.min(...exLat);
-    exLonMin = Math.min(...exLon);
-
-    exLat = exLat.map((x) => (x = x - exLatMin));
-    exLon = exLon.map((x) => (x = x - exLonMin));
-
-    exLatMax = Math.max(...exLat);
-    exLonMax = Math.max(...exLon);
-
-    exLat = exLat.map((x) => (x = (x / exLatMax) * 95));
-    exLon = exLon.map((x) => (x = (x / exLonMax) * 35 + 45));
-
-    color = "";
-    for (let i = 0; i < exLat.length; i++) {
-        var newPoint = document.createElement("div");
-        newPoint.className = "track";
-
-        // Set velocity color
-        if (data.vel[i] < 20 || !data.vel[i]) {
-            color = "#f54242";
-        } else if (data.vel[i] < 20) {
-            color = "#ffb300";
-        } else if (data.vel[i] < 40) {
-            color = "#fff700";
-        } else if (data.vel[i] < 60) {
-            color = "#bbff00";
-        } else if (data.vel[i] < 80) {
-            color = "#99ff00";
-        } else if (data.vel[i] < 100) {
-            color = "#f54242";
-        } else {
-            color = "#27ff00";
+    for (let i = 0; i < dweetDataSet.lat.length; i++) {
+        if (dweetDataSet.lat[i] == newLat && dweetDataSet.lon[i] == newLon) {
+            isNewLap = true;
+            lapData.time.push(dweetDataSet.time[dweetDataSet.time.length - 1]);
+            updateTable(lapData);
+            console.log("New Lap at", i, "of", newLat, "and", newLon);
         }
-
-        newPoint.style.backgroundColor = color;
-        newPoint.style.left = exLat[i] + "%";
-        newPoint.style.bottom = exLon[i] + "%";
-        $("#mapArea").append(newPoint);
     }
-}
 
-// Starts or stops data collection / presentation
-function startStop(e) {
-    let stopBtn = e.target;
-    if (inSession == false) {
-        stopBtn.classList.remove("green");
-        stopBtn.classList.add("orange");
-        inSession = true;
-        stopBtn.innerHTML = "stop";
+    // Update lap data in database
+    // patchData(fbUrl, "", "Dataset/" + sessionId, dweetDataSet);
 
-        console.log("Start");
-    } else {
-        stopBtn.classList.remove("orange");
-        stopBtn.classList.add("green");
-        inSession = false;
-        stopBtn.innerHTML = "start";
-
-        console.log("Stop");
-    }
-}
-
-// Reset data and graphs
-function reset(e) {
-    inSession = false;
-
-    // Reset data
-    dweetDataSet = {
-        accelX: [],
-        accelY: [],
-        brake: [],
-        gas: [],
-        lat: [],
-        lon: [],
-        time: [],
-        vel: [],
-        wheel: [],
-    };
-
-    // TESTING---------------------------------------------------
-    // runTestCode();
-    // dweetRandomData()
-
-    // Reset graphs
-    updateGraphs(dweetDataSet);
-
-    // Reset table----------------------------------------------------------------------
-    updateTable(dweetDataSet);
-
-    // Reset track
-    updateTrack(dweetDataSet);
-
-    // Generate new session id
-    sessionId = "session" + new Date().getTime();
-
-    // Reset start/stop button
-    let stopBtn = document.querySelector("#startStopBtn");
-    stopBtn.classList.remove("orange");
-    stopBtn.classList.add("green");
-    stopBtn.innerHTML = "start";
-
-    console.log("Reset");
-}
-
-// Download current session as CSV
-function downloadData() {
-    // download data --------------------------------------------------
-    console.log("Downloaded Data");
-}
-
-// Gets data from database
-async function getData(url, item) {
-    const response = await fetch(url + item + ".json");
-    return response.json();
-}
-
-// Updates database
-async function patchData(url, item, name, value) {
-    data = { [name]: value };
-    const response = await fetch(url + item + ".json", {
-        method: "PATCH",
-        body: JSON.stringify(data),
-    });
-}
-
-// Deletes data from database
-async function deleteData(url, item = "", name = "") {
-    // data = { [name]: value };
-    const response = await fetch(url + item + "/" + name + ".json", {
-        method: "DELETE",
-    });
-}
-
-// Gets latest dweet content
-async function getDweet(url = "") {
-    const response = await fetch(url);
-    return response.json();
-}
-
-// Posts data to dweet
-async function postDweet(url = "", postData = "") {
-    const response = await fetch(url + postData);
-    return response.json();
-}
-
-// Gets data from latest dweet and updates current dataset
-function extractDweet(dweet) {
-    // Add dweet content to dataset if not a repeat
-    if (!dweetDataSet.time.includes(Object.keys(dweet)[0])) {
-        for (var prop in dweet) {
-            let propData = dweet[prop].split(",");
-
-            // store dataset values
-            dweetDataSet.wheel.push(propData[0]);
-            dweetDataSet.gas.push(propData[1]);
-            dweetDataSet.brake.push(propData[2]);
-            dweetDataSet.accelX.push(propData[3]);
-            dweetDataSet.accelY.push(propData[4]);
-            dweetDataSet.lat.push(propData[5]);
-            dweetDataSet.lon.push(propData[6]);
-            dweetDataSet.time.push(prop);
-
-            // calc and store velocity
-            let velocity = calcVel();
-            dweetDataSet.vel.push(velocity.toFixed(2));
-        }
-        patchData(fbUrl, "", "Dataset/" + sessionId, dweetDataSet);
-
-        console.log("New Data Received");
-
-        return true;
-    } else {
-        console.log("Repeat Data Received");
-
-        return false;
-    }
+    return isNewLap;
 }
 
 // Calculate the velocity from Lat and Lon points
@@ -513,6 +484,53 @@ function calcVel() {
         velocity = 0;
     }
     return velocity;
+}
+
+// Gets data from latest dweet and updates current dataset
+function extractDweet(dweet) {
+    // Add dweet content to dataset if not a repeat
+    if (!dweetDataSet.time.includes(Object.keys(dweet)[0] / 1000)) {
+        for (var prop in dweet) {
+            let propData = dweet[prop].split(",");
+
+            // Check if new lap
+            newLap(propData);
+
+            // store dataset values
+            dweetDataSet.wheel.push(propData[0]);
+            dweetDataSet.gas.push(propData[1]);
+            dweetDataSet.brake.push(propData[2]);
+            dweetDataSet.accelX.push(propData[3]);
+            dweetDataSet.accelY.push(propData[4]);
+            dweetDataSet.lat.push(propData[5]);
+            dweetDataSet.lon.push(propData[6]);
+            dweetDataSet.time.push(prop / 1000);
+
+            // calc and store velocity
+            let velocity = calcVel();
+            dweetDataSet.vel.push(velocity.toFixed(2));
+        }
+
+        patchData(fbUrl, "", "Dataset/" + sessionId, dweetDataSet);
+
+        console.log("New Data Received");
+        return true;
+    } else {
+        console.log("Repeat Data Received");
+        return false;
+    }
+}
+
+// Gets latest dweet content
+async function getDweet(url = "") {
+    const response = await fetch(url);
+    return response.json();
+}
+
+// Posts data to dweet
+async function postDweet(url = "", postData = "") {
+    const response = await fetch(url + postData);
+    return response.json();
 }
 
 // Calculates the distance from Lon and Lat data points in a dataset
@@ -539,7 +557,25 @@ function getDistance(coords) {
     return distance;
 }
 
-function flushDatabase() {
-    deleteData(fbUrl, "Dataset");
-    console.log("Flushed Database");
+// Gets data from database
+async function getData(url, item) {
+    const response = await fetch(url + item + ".json");
+    return response.json();
+}
+
+// Updates database
+async function patchData(url, item, name, value) {
+    data = { [name]: value };
+    const response = await fetch(url + item + ".json", {
+        method: "PATCH",
+        body: JSON.stringify(data),
+    });
+}
+
+// Deletes data from database
+async function deleteData(url, item = "", name = "") {
+    // data = { [name]: value };
+    const response = await fetch(url + item + "/" + name + ".json", {
+        method: "DELETE",
+    });
 }

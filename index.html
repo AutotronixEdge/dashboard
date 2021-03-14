@@ -37,50 +37,55 @@
     <body class="grid">
         <!-- Graphs -->
         <div class="gasGraph">
-            <div id="gasGraph">Gas</div>
+            <div id="gasGraph"><b>GAS</b></div>
         </div>
         <div class="brakeGraph">
-            <div id="brakeGraph">Braking</div>
+            <div id="brakeGraph"><b>BRAKING</b></div>
         </div>
         <div class="accelXGraph">
-            <div id="accelXGraph">X-axis Acceleration</div>
+            <div id="accelXGraph"><b>X-AXIS ACCELERATION</b></div>
         </div>
         <div class="steeringGraph">
-            <div id="steeringGraph">Steering Wheel Rotation</div>
+            <div id="steeringGraph"><b>STEERING WHEEL ROTATION</b></div>
         </div>
         <div class="accelYGraph">
-            <div id="accelYGraph">Y-axis Acceleration</div>
+            <div id="accelYGraph"><b>Y-AXIS ACCELERATION</b></div>
         </div>
         <div class="velocityGraph">
-            <div id="velocityGraph">Velocity</div>
+            <div id="velocityGraph"><b>VELOCITY</b></div>
         </div>
 
         <!-- Lap Time Table -->
         <div class="laps">
             <div id="myGrid" class="ag-theme-alpine-dark"></div>
         </div>
-        <div class="lapTimes">
-            <p id="lapTimes"></p>
+        <div class="lapTimes row">
+            <div class="card-panel blue-grey darken-4">
+                <b>LAP STATISTICS</b>
+                <p id="lapTimes"></p>
+            </div>
         </div>
 
         <!-- Buttons -->
         <div class="buttons">
             <div class="row">
-                <div class="col" id="testId">
+                <div class="col s4" id="testId">
                     <a
                         id="startStopBtn"
-                        class="btn-small green darken-4 hoverable"
+                        class="btn green darken-4 hoverable customBtn"
                         >start</a
                     >
                 </div>
-                <div class="col">
-                    <a id="resetBtn" class="btn-small red darken-4 hoverable"
+                <div class="col s4">
+                    <a
+                        id="resetBtn"
+                        class="btn red darken-4 hoverable customBtn"
                         >reset</a
                     >
                 </div>
-                <div class="col">
+                <div class="col s4">
                     <a
-                        class="btn-small blue darken-4 hoverable"
+                        class="btn blue darken-4 hoverable customBtn"
                         id="downloadBtn"
                         >download</a
                     >
@@ -88,8 +93,8 @@
 
                 <!-- TESTING -->
                 <div class="row"></div>
-                <div class="col">
-                    <a class="btn-small blue-grey hoverable" id="flushBtn"
+                <div class="col s12">
+                    <a class="btn blue-grey hoverable customBtn" id="flushBtn"
                         >flush database</a
                     >
                 </div>
@@ -97,10 +102,13 @@
         </div>
 
         <!-- Track -->
-        <div class="map">
-            <div id="mapArea">
-                <div id="map"></div>
-            </div>
+        <div class="map card-panel blue-grey darken-4">
+            <b>TRACK</b>
+            <div id="mapArea"></div>
+        </div>
+
+        <!-- Misc -->
+        <div class="misc">
             <img id="logo" src="autotronixLogoOpaque.png" />
         </div>
 
