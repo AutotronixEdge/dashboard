@@ -4,6 +4,7 @@ async function startup() {
     myTimer = setInterval(timerFunction, 3000);
 
     // Setup event listeners
+    document.querySelector("#loginBtn").addEventListener("click", login);
     document
         .querySelector("#startStopBtn")
         .addEventListener("click", startStop);
@@ -14,6 +15,7 @@ async function startup() {
     document
         .querySelector("#extrasBtn")
         .addEventListener("click", showExtrasPanel);
+    document.querySelector("#helpBtn").addEventListener("click", showHelpPanel);
 
     // Window resize event listener
     window.addEventListener("resize", windowResize);
@@ -25,6 +27,9 @@ async function startup() {
 
     // Initial reset
     reset();
+
+    // Set focus on login
+    document.querySelector("#racer_id").focus();
 
     function timerFunction() {
         if (inSession == true) {
@@ -48,14 +53,38 @@ async function refresh() {
         }
         updateTrack(dweetDataSet);
     }
+}
 
-    // extract data (function)------------------------------------------------------
-    //     if data is new (function)
-    //         check lap number (function)
-    //         update graphs (function)
-    //         update track (function)
-    //         if new lap
-    //             update table (function)
+// Login to the site
+function login() {
+    // Get form values
+    let idForm = document.querySelector("#racer_id");
+    let codeForm = document.querySelector("#access_code");
+
+    // Check access code
+    if (codeForm.value == accessCode) {
+        if (idForm.value != "") {
+            racerId = idForm.value;
+        }
+        let loginPanel = document.querySelector("#loginPanel");
+        loginPanel.style.visibility = "hidden";
+
+        M.Toast.dismissAll();
+        M.toast({
+            html: "Loggin in as " + racerId,
+            classes: "green",
+        });
+
+        console.log("Logged in as", idForm.value);
+    } else {
+        codeForm.value = "";
+        codeForm.focus();
+
+        M.Toast.dismissAll();
+        M.toast({ html: "Incorrect Access Code", classes: "red lighten-2" });
+
+        console.log("Incorrect Access Code");
+    }
 }
 
 // Starts or stops data collection / presentation
@@ -135,17 +164,30 @@ function downloadData(e) {
 // Shows the extras panel
 function showExtrasPanel() {
     let extrasPanel = document.querySelector("#extrasPanel");
-    if (extrasPanel.style.visibility == "hidden") {
-        extrasPanel.style.visibility = "visible";
-    } else {
+    if (extrasPanel.style.visibility == "visible") {
         extrasPanel.style.visibility = "hidden";
+    } else {
+        extrasPanel.style.visibility = "visible";
+        document.querySelector("#helpPanel").style.visibility = "hidden";
+    }
+    console.log("Extras Panel");
+}
+
+// Shows the help panel
+function showHelpPanel() {
+    let helpPanel = document.querySelector("#helpPanel");
+    if (helpPanel.style.visibility == "visible") {
+        helpPanel.style.visibility = "hidden";
+    } else {
+        helpPanel.style.visibility = "visible";
+        document.querySelector("#extrasPanel").style.visibility = "hidden";
     }
     console.log("Extras Panel");
 }
 
 // Deletes all data from database
 function flushDatabase() {
-    deleteData(fbUrl, "Dataset");
+    deleteData(fbUrl, "");
 
     console.log("Flushed Database");
 }
@@ -261,15 +303,7 @@ function updateGraphs(data) {
             title: "",
             // range: [0, 200], //Constant Range
             showgrid: false,
-            // showline: true,
-            // zeroline: true,
-            // mirror: "ticks",
-            // gridcolor: "white",
-            // gridwidth: 2,
             zerolinecolor: "white",
-            // zerolinewidth: 14,
-            // linecolor: "cyan",
-            // linewidth: 6,
             tickfont: {
                 color: "white",
             },
@@ -399,7 +433,6 @@ function updateTable(data) {
     // Clears table to be remade
     document.getElementById("myGrid").innerHTML = "";
 
-    // TABLE STUFF-----------------------------------------------------------------T
     viewWidth = window.innerWidth;
     viewWidth = viewWidth * 0.55 - 60;
     colWidth = viewWidth / 6;
@@ -449,7 +482,7 @@ function updateTable(data) {
     gridDiv = document.querySelector("#myGrid");
     new agGrid.Grid(gridDiv, gridOptions);
 
-    // ----- Table Data -----
+    // Lap calculations
     var i;
     rowDataSum = 0;
     rowDataSet = [];
@@ -473,8 +506,6 @@ function updateTable(data) {
         "Maximum Lap Time: " +
         rowDataMax.toFixed(2) +
         " s";
-    // ----- Table Data -----
-    // TABLE STUFF-----------------------------------------------------------------T
 }
 
 // Checks if a new lap has started and updates lap data
@@ -494,6 +525,7 @@ function newLap(newData) {
         }
     }
 
+    // TESTING
     // Update lap data in database
     // patchData(fbUrl, "", "Dataset/" + sessionId, dweetDataSet);
 
@@ -539,7 +571,7 @@ function extractDweet(dweet) {
             dweetDataSet.vel.push(velocity.toFixed(2));
         }
 
-        patchData(fbUrl, "", "Dataset/" + sessionId, dweetDataSet);
+        patchData(fbUrl, "", racerId + "/Dataset/" + sessionId, dweetDataSet);
 
         console.log("New Data Received");
         return true;

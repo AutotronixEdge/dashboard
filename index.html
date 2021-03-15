@@ -2,36 +2,37 @@
 <html>
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Autotronix Dashboard</title>
+
+        <!-- Online Files -->
+        <!-- CSS -->
+        <link
+            href="https://fonts.googleapis.com/icon?family=Material+Icons"
+            rel="stylesheet"
+        />
+        <!-- JS -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <script src="https://unpkg.com/@ag-grid-community/all-modules@25.0.0/dist/ag-grid-community.min.js"></script>
 
         <!-- Local Files -->
         <!-- Media -->
         <link rel="icon" href="autotronixLogoLetter.png" />
         <!-- CSS -->
-        <link rel="stylesheet" href="css/stylesheet.css" />
         <link
             type="text/css"
             rel="stylesheet"
             href="css/materialize.min.css"
             media="screen,projection"
         />
+        <link rel="stylesheet" href="css/stylesheet.css" />
         <!-- JS -->
         <script src="js/main.js"></script>
+        <script type="text/javascript" src="js/materialize.min.js"></script>
         <script src="js/variables.js"></script>
         <script src="js/testFunctions.js"></script>
-
-        <!-- Online Files -->
-        <!-- JS -->
-        <!-- jQuery -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-        <!-- Graphing -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
-        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-
-        <!-- Tables -->
-        <script src="https://unpkg.com/@ag-grid-community/all-modules@25.0.0/dist/ag-grid-community.min.js"></script>
     </head>
 
     <body class="grid">
@@ -69,34 +70,60 @@
         <!-- Buttons -->
         <div class="buttons">
             <div class="row">
-                <div class="col s4" id="testId">
-                    <a id="startStopBtn" class="btn green darken-4 customBtn"
+                <!-- Start / Stop Button -->
+                <div class="col s4">
+                    <a
+                        id="startStopBtn"
+                        class="btn waves-effect waves-light green darken-4 customBtn"
                         >start</a
                     >
                 </div>
+
+                <!-- Reset Button -->
                 <div class="col s4">
-                    <a id="resetBtn" class="btn red darken-4 customBtn"
+                    <a
+                        id="resetBtn"
+                        class="btn waves-effect waves-light red darken-4 customBtn"
                         >reset</a
                     >
                 </div>
+
+                <!-- Download Button -->
                 <div class="col s4">
-                    <a class="btn blue darken-4 customBtn" id="downloadBtn"
+                    <a
+                        class="btn waves-effect waves-light blue darken-4 customBtn"
+                        id="downloadBtn"
                         >download</a
                     >
                 </div>
 
-                <!-- Misc Button -->
                 <div class="row"></div>
-                <div class="col s12">
-                    <a class="btn purple darken-4 customBtn" id="extrasBtn"
-                        >Extras</a
+
+                <!-- Extras Button -->
+                <div class="col s6">
+                    <a
+                        class="btn waves-effect waves-light purple darken-4 customBtn"
+                        id="extrasBtn"
+                        >extras</a
                     >
                 </div>
 
-                <!-- TESTING -->
+                <!-- Help Button -->
+                <div class="col s6">
+                    <a
+                        class="btn waves-effect waves-light brown customBtn"
+                        id="helpBtn"
+                        >help</a
+                    >
+                </div>
+
                 <div class="row"></div>
+
+                <!-- TESTING -->
                 <div class="col s12">
-                    <a class="btn blue-grey customBtn" id="flushBtn"
+                    <a
+                        class="btn waves-effect waves-light blue-grey customBtn"
+                        id="flushBtn"
                         >flush database</a
                     >
                 </div>
@@ -116,16 +143,186 @@
 
         <!-- Extras Panel -->
         <div id="extrasPanel">
+            <!-- Title -->
             <div class="row">
-                <!-- Title -->
                 <div class="row"></div>
                 <div class="col s12">
                     <b>EXTRAS PANEL</b>
                 </div>
-                <!-- TESTING - Graph -->
+            </div>
+            <!-- TESTING - Graph -->
+            <div class="row">
                 <div class="col s6 graphCol">
                     <div class="graphCol" id="testGraph">
                         <b>Z-AXIS ACCELERATION</b>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Panel -->
+        <div id="helpPanel">
+            <!-- Title -->
+            <div class="row">
+                <div class="row"></div>
+                <div class="col s12">
+                    <b>HELP PANEL</b>
+                </div>
+            </div>
+            <!-- Help Content -->
+            <div class="row helpText">
+                <!-- Left Side -->
+                <div class="col m12 l6">
+                    <!-- Graphs -->
+                    <div class="col s12">
+                        <blockquote>
+                            <h5>Graphs</h5>
+                            <hr />
+                            <p>
+                                This section shows graphs of the 6 main
+                                statistics including vehicle velocity, y-axis
+                                acceleration, x-axis acceleration, gas pedal
+                                position, brake pedal position, and steering
+                                wheel rotation.
+                            </p>
+                        </blockquote>
+                    </div>
+
+                    <!-- Lap Table -->
+                    <div class="col s12">
+                        <blockquote>
+                            <h5>Lap Table</h5>
+                            <hr />
+                            <p>
+                                This section shows the overall lap times,
+                                section times, and some general lap statistics.
+                            </p>
+                            <p>
+                                The lap is broken up into 5 sections to give
+                                further insight into certain parts of the track.
+                            </p>
+                        </blockquote>
+                    </div>
+
+                    <!-- Track -->
+                    <div class="col s12">
+                        <blockquote>
+                            <h5>Track</h5>
+                            <hr />
+                            <p>This section plots the GPS position history.</p>
+                            <p>
+                                The
+                                <b class="purple-text text-lighten-2"
+                                    >magenta</b
+                                >
+                                point indicates the starting position of the
+                                session.
+                            </p>
+                            <p>
+                                The
+                                <b class="cyan-text">cyan</b> point indicates
+                                the latest position of the session.
+                            </p>
+                        </blockquote>
+                    </div>
+
+                    <!-- Extras Panel -->
+                    <div class="col s12">
+                        <blockquote>
+                            <h5>Extras Panel</h5>
+                            <hr />
+                            <p>
+                                This panel shows the z-axis acceleration graph.
+                            </p>
+                        </blockquote>
+                    </div>
+                </div>
+
+                <!-- Right Side -->
+                <div class="col m12 l6">
+                    <!-- Buttons -->
+                    <div class="col s12">
+                        <blockquote>
+                            <h5>Buttons</h5>
+                            <hr />
+                            <p><b>START / STOP</b></p>
+                            <p>
+                                This button starts and stops the current
+                                session.
+                            </p>
+                            <p><b>RESET</b></p>
+                            <p>
+                                This button resets the graphs, table, and track,
+                                then gets the system ready to start a new
+                                session.
+                            </p>
+                            <p><b>DOWNLOAD</b></p>
+                            <p>
+                                This button downloads the current working
+                                dataset as a json file.
+                            </p>
+                            <p><b>EXTRAS</b></p>
+                            <p>
+                                This buttons shows the extras panel where
+                                miscellaneous graphs and information can be
+                                shown.
+                            </p>
+                            <p><b>FLUSH DATABASE</b></p>
+                            <p>
+                                This button erases the database, including all
+                                previous sessions.
+                            </p>
+                        </blockquote>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login Panel -->
+        <div class="valign-wrapper" id="loginPanel">
+            <div class="row">
+                <div class="col s12 card-panel blue-grey darken-2 hoverable">
+                    <!-- Logo -->
+                    <div class="row"></div>
+                    <div class="center-align">
+                        <img class="loginLogo" src="autotronixLogoOpaque.png" />
+                    </div>
+
+                    <!-- Login Forms -->
+                    <div class="row">
+                        <!-- Racer ID -->
+                        <div class="col s12 input-field">
+                            <i class="material-icons prefix">directions_car</i>
+                            <input
+                                placeholder="Racer ID"
+                                id="racer_id"
+                                type="text"
+                                class="white-text"
+                            />
+                        </div>
+
+                        <!-- Access Code -->
+                        <div class="col s12 input-field">
+                            <i class="material-icons prefix">lock</i>
+                            <input
+                                placeholder="Access Code"
+                                id="access_code"
+                                type="password"
+                                class="white-text"
+                            />
+                        </div>
+
+                        <!-- Submit Login Button -->
+                        <div class="col s12">
+                            <button
+                                id="loginBtn"
+                                class="btn blue-grey customBtn"
+                                type="submit"
+                                name="action"
+                            >
+                                login
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

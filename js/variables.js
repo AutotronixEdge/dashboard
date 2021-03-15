@@ -1,4 +1,7 @@
 // Variables
+racerId = "default_racer_id";
+accessCode = "1234";
+
 fbUrl = "https://autotronix-test-database-default-rtdb.firebaseio.com/";
 getUrl = "https://dweet.io/get/latest/dweet/for/AutotronixDataTransfer";
 postUrl = "https://dweet.io/dweet/for/AutotronixDataTransfer?";

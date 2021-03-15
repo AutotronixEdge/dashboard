@@ -158,7 +158,7 @@ body {
 /* Extras Panel */
 #extrasPanel {
     position: absolute;
-    visibility: visible;
+    visibility: hidden;
     background-color: rgba(38, 50, 56, 0.95);
     width: 75vw;
     height: 100vh;
@@ -167,6 +167,34 @@ body {
 .graphCol {
     height: 30vh;
     padding: none;
+}
+
+/* Help Panel */
+#helpPanel {
+    position: absolute;
+    visibility: hidden;
+    background-color: rgba(38, 50, 56, 0.95);
+    width: 75vw;
+    height: 100vh;
+}
+
+/* Login Panel */
+#loginPanel {
+    position: absolute;
+    visibility: visible;
+    background-color: rgba(38, 50, 56, 0.95);
+    width: 100vw;
+    height: 100vh;
+    z-index: 999;
+}
+
+.loginLogo {
+    width: 250px !important;
+}
+
+/* Other */
+.helpText {
+    text-align: left;
 }
 
 /* ~~ Resize for Mobile ~~ */
