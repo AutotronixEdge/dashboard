@@ -11,6 +11,12 @@ async function startup() {
     document
         .querySelector("#downloadBtn")
         .addEventListener("click", downloadData);
+    document
+        .querySelector("#extrasBtn")
+        .addEventListener("click", showExtrasPanel);
+
+    // Window resize event listener
+    window.addEventListener("resize", windowResize);
 
     // TESTING
     document
@@ -124,6 +130,17 @@ function downloadData(e) {
     dlBtn.setAttribute("download", sessionId + ".json");
 
     console.log("Downloaded Data");
+}
+
+// Shows the extras panel
+function showExtrasPanel() {
+    let extrasPanel = document.querySelector("#extrasPanel");
+    if (extrasPanel.style.visibility == "hidden") {
+        extrasPanel.style.visibility = "visible";
+    } else {
+        extrasPanel.style.visibility = "hidden";
+    }
+    console.log("Extras Panel");
 }
 
 // Deletes all data from database
@@ -312,6 +329,9 @@ function updateGraphs(data) {
     Plotly.newPlot("gasGraph", gasData, layout, { responsive: true });
     Plotly.newPlot("brakeGraph", brakeData, layout, { responsive: true });
     Plotly.newPlot("steeringGraph", steerData, layout, { responsive: true });
+
+    // TESTING - Extras panel
+    Plotly.newPlot("testGraph", steerData, layout, { responsive: true });
 }
 
 // Updates the track
@@ -585,4 +605,9 @@ async function deleteData(url, item = "", name = "") {
     const response = await fetch(url + item + "/" + name + ".json", {
         method: "DELETE",
     });
+}
+
+// Run on window resize
+function windowResize() {
+    updateTable(lapData);
 }

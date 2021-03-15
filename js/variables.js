@@ -17,6 +17,7 @@ dweetDataSet = {
 
 lapData = {
     isNewLap: false,
+    lapNum: 0,
     time: [],
     lat: [],
     lon: [],

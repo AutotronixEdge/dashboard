@@ -70,31 +70,33 @@
         <div class="buttons">
             <div class="row">
                 <div class="col s4" id="testId">
-                    <a
-                        id="startStopBtn"
-                        class="btn green darken-4 hoverable customBtn"
+                    <a id="startStopBtn" class="btn green darken-4 customBtn"
                         >start</a
                     >
                 </div>
                 <div class="col s4">
-                    <a
-                        id="resetBtn"
-                        class="btn red darken-4 hoverable customBtn"
+                    <a id="resetBtn" class="btn red darken-4 customBtn"
                         >reset</a
                     >
                 </div>
                 <div class="col s4">
-                    <a
-                        class="btn blue darken-4 hoverable customBtn"
-                        id="downloadBtn"
+                    <a class="btn blue darken-4 customBtn" id="downloadBtn"
                         >download</a
+                    >
+                </div>
+
+                <!-- Misc Button -->
+                <div class="row"></div>
+                <div class="col s12">
+                    <a class="btn purple darken-4 customBtn" id="extrasBtn"
+                        >Extras</a
                     >
                 </div>
 
                 <!-- TESTING -->
                 <div class="row"></div>
                 <div class="col s12">
-                    <a class="btn blue-grey hoverable customBtn" id="flushBtn"
+                    <a class="btn blue-grey customBtn" id="flushBtn"
                         >flush database</a
                     >
                 </div>
@@ -110,6 +112,23 @@
         <!-- Misc -->
         <div class="misc">
             <img id="logo" src="autotronixLogoOpaque.png" />
+        </div>
+
+        <!-- Extras Panel -->
+        <div id="extrasPanel">
+            <div class="row">
+                <!-- Title -->
+                <div class="row"></div>
+                <div class="col s12">
+                    <b>EXTRAS PANEL</b>
+                </div>
+                <!-- TESTING - Graph -->
+                <div class="col s6 graphCol">
+                    <div class="graphCol" id="testGraph">
+                        <b>Z-AXIS ACCELERATION</b>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Startup Script -->

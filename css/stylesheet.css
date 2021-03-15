@@ -24,7 +24,7 @@ body {
     height: 100vh;
     padding: 0px;
     margin: 0px;
-    user-select: none;
+    /* user-select: none; */
 }
 
 .grid {
@@ -36,6 +36,7 @@ body {
         "accelY accelY brake brake map"
         "accelX accelX steering steering map"
         "laps laps laps lapTimes misc";
+
     text-align: center;
 }
 
@@ -119,6 +120,7 @@ body {
 .buttons {
     grid-area: buttons;
     padding-top: var(--spacing);
+    user-select: none;
 }
 
 .customBtn {
@@ -145,6 +147,7 @@ body {
     grid-area: misc;
     position: relative;
 }
+
 #logo {
     position: absolute;
     width: 50%;
@@ -152,11 +155,18 @@ body {
     right: 25%;
 }
 
-/* ~~ Extra ~~ */
-input,
-textarea,
-button {
-    outline: none;
+/* Extras Panel */
+#extrasPanel {
+    position: absolute;
+    visibility: visible;
+    background-color: rgba(38, 50, 56, 0.95);
+    width: 75vw;
+    height: 100vh;
+}
+
+.graphCol {
+    height: 30vh;
+    padding: none;
 }
 
 /* ~~ Resize for Mobile ~~ */
