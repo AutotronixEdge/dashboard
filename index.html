@@ -104,7 +104,8 @@
                     <a
                         class="btn waves-effect waves-light purple darken-4 customBtn"
                         id="extrasBtn"
-                        >extras</a
+                    >
+                        <i class="material-icons left">settings</i>extras</a
                     >
                 </div>
 
@@ -113,7 +114,7 @@
                     <a
                         class="btn waves-effect waves-light brown customBtn"
                         id="helpBtn"
-                        >help</a
+                        ><i class="material-icons left">help_outline</i>help</a
                     >
                 </div>
 
@@ -150,12 +151,52 @@
                     <b>EXTRAS PANEL</b>
                 </div>
             </div>
-            <!-- TESTING - Graph -->
             <div class="row">
-                <div class="col s6 graphCol">
-                    <div class="graphCol" id="testGraph">
-                        <b>Z-AXIS ACCELERATION</b>
+                <!-- TESTING - Graph - left side -->
+                <div class="col s6">
+                    <div class="row">
+                        <div class="col s11 graphCol" id="testGraph">
+                            <b>Z-AXIS ACCELERATION</b>
+                        </div>
                     </div>
+                </div>
+
+                <!-- right side -->
+                <div class="col s6">
+                    <blockquote>
+                        <h5 class="left-align">Settings</h5>
+                        <hr />
+                        <div class="row"></div>
+                        <div class="row">
+                            <!-- Logout Button -->
+                            <div class="col s12">
+                                <a class="btn blue-grey col s12" id="logoutBtn"
+                                    ><i class="material-icons right">logout</i
+                                    >Logout</a
+                                >
+                            </div>
+
+                            <div class="row"></div>
+
+                            <!-- Change Access Code -->
+                            <div class="col s8 input-field">
+                                <i class="material-icons prefix">lock</i>
+                                <input
+                                    placeholder="New Access Code"
+                                    id="new_access_code"
+                                    type="password"
+                                    class="white-text"
+                                />
+                            </div>
+                            <div class="col s4 input-field">
+                                <a
+                                    class="btn red lighten-1 col s12"
+                                    id="newCodeBtn"
+                                    >Change Code</a
+                                >
+                            </div>
+                        </div>
+                    </blockquote>
                 </div>
             </div>
         </div>
@@ -204,6 +245,73 @@
                         </blockquote>
                     </div>
 
+                    <!-- Extras Panel -->
+                    <div class="col s12">
+                        <blockquote>
+                            <h5>Extras Panel</h5>
+                            <hr />
+                            <p>
+                                This panel shows the z-axis acceleration graph.
+                            </p>
+                            <p>
+                                This panel also allows you to logout, or change
+                                the access code.
+                            </p>
+                        </blockquote>
+                    </div>
+
+                    <!-- Login -->
+                    <div class="col s12">
+                        <blockquote>
+                            <h5>Login</h5>
+                            <hr />
+                            <p>
+                                The Driver ID is what is determines how the
+                                session data is stored in the database.
+                            </p>
+                            <p>The Access Code is set in stone.</p>
+                        </blockquote>
+                    </div>
+                </div>
+
+                <!-- Right Side -->
+                <div class="col m12 l6">
+                    <!-- Buttons -->
+                    <div class="col s12">
+                        <blockquote>
+                            <h5>Buttons</h5>
+                            <hr />
+                            <div class="btn green darken-4">START</div>
+                            <div class="btn orange darken-4">STOP</div>
+                            <p>
+                                This button starts and stops the current
+                                session.
+                            </p>
+                            <div class="btn red darken-4">RESET</div>
+                            <p>
+                                This button resets the graphs, table, and track,
+                                then gets the system ready to start a new
+                                session.
+                            </p>
+                            <div class="btn blue darken-4">DOWNLOAD</div>
+                            <p>
+                                This button downloads the current working
+                                dataset as a json file.
+                            </p>
+                            <div class="btn purple darken-4">EXTRAS</div>
+                            <p>
+                                This buttons shows the extras panel where
+                                miscellaneous graphs and information can be
+                                shown.
+                            </p>
+                            <div class="btn brown">FLUSH DATABASE</div>
+                            <p>
+                                This button erases the database, including all
+                                previous sessions.
+                            </p>
+                        </blockquote>
+                    </div>
+
                     <!-- Track -->
                     <div class="col s12">
                         <blockquote>
@@ -223,54 +331,10 @@
                                 <b class="cyan-text">cyan</b> point indicates
                                 the latest position of the session.
                             </p>
-                        </blockquote>
-                    </div>
-
-                    <!-- Extras Panel -->
-                    <div class="col s12">
-                        <blockquote>
-                            <h5>Extras Panel</h5>
-                            <hr />
                             <p>
-                                This panel shows the z-axis acceleration graph.
-                            </p>
-                        </blockquote>
-                    </div>
-                </div>
-
-                <!-- Right Side -->
-                <div class="col m12 l6">
-                    <!-- Buttons -->
-                    <div class="col s12">
-                        <blockquote>
-                            <h5>Buttons</h5>
-                            <hr />
-                            <p><b>START / STOP</b></p>
-                            <p>
-                                This button starts and stops the current
-                                session.
-                            </p>
-                            <p><b>RESET</b></p>
-                            <p>
-                                This button resets the graphs, table, and track,
-                                then gets the system ready to start a new
-                                session.
-                            </p>
-                            <p><b>DOWNLOAD</b></p>
-                            <p>
-                                This button downloads the current working
-                                dataset as a json file.
-                            </p>
-                            <p><b>EXTRAS</b></p>
-                            <p>
-                                This buttons shows the extras panel where
-                                miscellaneous graphs and information can be
-                                shown.
-                            </p>
-                            <p><b>FLUSH DATABASE</b></p>
-                            <p>
-                                This button erases the database, including all
-                                previous sessions.
+                                The color of the remaining points indicates the
+                                speed bracket at that location, with red being
+                                the slowest, and green being the fastest.
                             </p>
                         </blockquote>
                     </div>
@@ -320,6 +384,7 @@
                                 type="submit"
                                 name="action"
                             >
+                                <i class="material-icons right">login</i>
                                 login
                             </button>
                         </div>

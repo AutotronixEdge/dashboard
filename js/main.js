@@ -5,6 +5,10 @@ async function startup() {
 
     // Setup event listeners
     document.querySelector("#loginBtn").addEventListener("click", login);
+    document.querySelector("#logoutBtn").addEventListener("click", logout);
+    document
+        .querySelector("#newCodeBtn")
+        .addEventListener("click", newAccessCode);
     document
         .querySelector("#startStopBtn")
         .addEventListener("click", startStop);
@@ -69,13 +73,16 @@ function login() {
         let loginPanel = document.querySelector("#loginPanel");
         loginPanel.style.visibility = "hidden";
 
+        idForm.value = "";
+        codeForm.value = "";
+
         M.Toast.dismissAll();
         M.toast({
-            html: "Loggin in as " + racerId,
+            html: "Logged In as " + racerId,
             classes: "green",
         });
 
-        console.log("Logged in as", idForm.value);
+        console.log(racerId, "logged in");
     } else {
         codeForm.value = "";
         codeForm.focus();
@@ -85,6 +92,39 @@ function login() {
 
         console.log("Incorrect Access Code");
     }
+}
+
+// Logout of the site
+function logout() {
+    reset();
+    racerId = "default_racer";
+
+    let loginPanel = document.querySelector("#loginPanel");
+    loginPanel.style.visibility = "visible";
+    document.querySelector("#racer_id").focus();
+
+    M.Toast.dismissAll();
+    M.toast({
+        html: "Logged Out",
+        classes: "green",
+    });
+
+    console.log(racerId, "logged out");
+}
+
+// Changes the access code
+function newAccessCode() {
+    let codeText = document.querySelector("#new_access_code");
+    accessCode = codeText.value;
+    codeText.value = "";
+
+    M.Toast.dismissAll();
+    M.toast({
+        html: "Access Code Changed",
+        classes: "green",
+    });
+
+    console.log("Access code changed to", accessCode);
 }
 
 // Starts or stops data collection / presentation
