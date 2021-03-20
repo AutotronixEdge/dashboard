@@ -165,8 +165,8 @@ function reset(e) {
     };
 
     // TESTING---------------------------------------------------
-    runTestCode();
-    dweetRandomData();
+    // runTestCode();
+    // dweetRandomData();
 
     // Reset graphs
     updateGraphs(dweetDataSet);
@@ -459,12 +459,12 @@ function updateTrack(data) {
     if (inSession) {
         let testElement = document.querySelector("#mapArea").firstElementChild;
         testElement.style.backgroundColor = "magenta";
-        testElement.style.width = "1em";
-        testElement.style.height = "1em";
+        testElement.style.width = "1vw";
+        testElement.style.height = "1vw";
         let testElement2 = document.querySelector("#mapArea").lastElementChild;
         testElement2.style.backgroundColor = "cyan";
-        testElement2.style.width = "1em";
-        testElement2.style.height = "1em";
+        testElement2.style.width = "1vw";
+        testElement2.style.height = "1vw";
     }
 }
 
