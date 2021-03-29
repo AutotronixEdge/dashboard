@@ -9,6 +9,7 @@ postUrl = "https://dweet.io/dweet/for/AutotronixDataTransfer?";
 dweetDataSet = {
     accelX: [],
     accelY: [],
+    accelZ: [],
     brake: [],
     gas: [],
     lat: [],

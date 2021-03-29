@@ -186,6 +186,10 @@ body {
 #loginPanel {
     position: absolute;
     visibility: visible;
+
+    /* TESTING */
+    visibility: hidden;
+
     background-color: rgba(38, 50, 56, 0.95);
     width: 100vw;
     height: 100vh;

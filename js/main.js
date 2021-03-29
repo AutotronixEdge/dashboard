@@ -50,7 +50,7 @@ async function refresh() {
     let isNewData = extractDweet(dweetContent);
 
     // Update if new data
-    if (isNewData) {
+    if (isNewData && !jQuery.isEmptyObject(dweetContent)) {
         updateGraphs(dweetDataSet);
         if (lapData.isNewLap) {
             // updateTable(lapData);
@@ -155,6 +155,7 @@ function reset(e) {
     dweetDataSet = {
         accelX: [],
         accelY: [],
+        accelZ: [],
         brake: [],
         gas: [],
         lat: [],
@@ -247,7 +248,7 @@ function updateGraphs(data) {
             width: 2,
             shape: "spline",
         },
-        text: "m/s",
+        text: "mph",
         name: "Velocity",
     };
 
@@ -283,6 +284,23 @@ function updateGraphs(data) {
         },
         text: "m/s^2",
         name: "X-Axis Acceleration",
+    };
+
+    var accelZTrace = {
+        x: data.time,
+        y: data.accelZ,
+        mode: "lines+markers",
+        marker: {
+            color: "cyan",
+            size: 6,
+        },
+        line: {
+            color: "cyan",
+            width: 2,
+            shape: "spline",
+        },
+        text: "m/s^2",
+        name: "Z-Axis Acceleration",
     };
 
     var gasTrace = {
@@ -392,6 +410,7 @@ function updateGraphs(data) {
     var velData = [velTrace];
     var accelYData = [accelYTrace];
     var accelXData = [accelXTrace];
+    var accelZData = [accelZTrace];
     var gasData = [gasTrace];
     var brakeData = [brakeTrace];
     var steerData = [steerTrace];
@@ -400,12 +419,10 @@ function updateGraphs(data) {
     Plotly.newPlot("velocityGraph", velData, layout, { responsive: true });
     Plotly.newPlot("accelYGraph", accelYData, layout, { responsive: true });
     Plotly.newPlot("accelXGraph", accelXData, layout, { responsive: true });
+    Plotly.newPlot("accelZGraph", accelZData, layout, { responsive: true });
     Plotly.newPlot("gasGraph", gasData, layout, { responsive: true });
     Plotly.newPlot("brakeGraph", brakeData, layout, { responsive: true });
     Plotly.newPlot("steeringGraph", steerData, layout, { responsive: true });
-
-    // TESTING - Extras panel
-    Plotly.newPlot("testGraph", steerData, layout, { responsive: true });
 }
 
 // Updates the track
@@ -589,7 +606,10 @@ function calcVel() {
 // Gets data from latest dweet and updates current dataset
 function extractDweet(dweet) {
     // Add dweet content to dataset if not a repeat
-    if (!dweetDataSet.time.includes(Object.keys(dweet)[0] / 1000)) {
+    if (jQuery.isEmptyObject(dweet)) {
+        console.log("No Data Received");
+        return false;
+    } else if (!dweetDataSet.time.includes(Object.keys(dweet)[0] / 1000)) {
         for (var prop in dweet) {
             let propData = dweet[prop].split(",");
 
@@ -602,13 +622,15 @@ function extractDweet(dweet) {
             dweetDataSet.brake.push(propData[2]);
             dweetDataSet.accelX.push(propData[3]);
             dweetDataSet.accelY.push(propData[4]);
-            dweetDataSet.lat.push(propData[5]);
-            dweetDataSet.lon.push(propData[6]);
+            dweetDataSet.accelZ.push(propData[5]);
+            dweetDataSet.lat.push(propData[6]);
+            dweetDataSet.lon.push(propData[7]);
+            dweetDataSet.vel.push((propData[8] / 1000) * 2.237);
             dweetDataSet.time.push(prop / 1000);
 
             // calc and store velocity
             let velocity = calcVel();
-            dweetDataSet.vel.push(velocity.toFixed(2));
+            // dweetDataSet.vel.push(velocity.toFixed(2));
         }
 
         patchData(fbUrl, "", racerId + "/Dataset/" + sessionId, dweetDataSet);
