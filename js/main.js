@@ -4,11 +4,22 @@ async function startup() {
     myTimer = setInterval(timerFunction, 3000);
 
     // Setup event listeners
+    // Login
     document.querySelector("#loginBtn").addEventListener("click", login);
+    // Extras
     document.querySelector("#logoutBtn").addEventListener("click", logout);
     document
         .querySelector("#newCodeBtn")
         .addEventListener("click", newAccessCode);
+    document
+        .querySelector("#closeExtrasBtn")
+        .addEventListener("click", closeExtrasPanel);
+    document.querySelector("#uploadBtn").addEventListener("click", uploadJSON);
+    // Help
+    document
+        .querySelector("#closeHelpBtn")
+        .addEventListener("click", closeHelpPanel);
+    // Main Buttons
     document
         .querySelector("#startStopBtn")
         .addEventListener("click", startStop);
@@ -150,6 +161,7 @@ function startStop(e) {
 // Reset data and graphs
 function reset(e) {
     inSession = false;
+    isUploaded = false;
 
     // Reset data
     dweetDataSet = {
@@ -167,7 +179,7 @@ function reset(e) {
 
     // TESTING---------------------------------------------------
     // runTestCode();
-    // dweetRandomData();
+    dweetRandomData();
 
     // Reset graphs
     updateGraphs(dweetDataSet);
@@ -202,13 +214,32 @@ function downloadData(e) {
     console.log("Downloaded Data");
 }
 
+// Uploads JSON text
+function uploadJSON() {
+    let jsonText = document.querySelector("#jsonText");
+    uploadedDataset = JSON.parse(jsonText.value);
+
+    jsonText.value = "";
+
+    reset();
+
+    inSession = false;
+    isUploaded = true;
+
+    updateGraphs(uploadedDataset);
+    updateTrack(uploadedDataset);
+
+    console.log("JSON Data Uploaded");
+}
+
 // Shows the extras panel
 function showExtrasPanel() {
     let extrasPanel = document.querySelector("#extrasPanel");
     if (extrasPanel.style.visibility == "visible") {
-        extrasPanel.style.visibility = "hidden";
+        closeExtrasPanel();
     } else {
         extrasPanel.style.visibility = "visible";
+        extrasPanel.style.left = "0vw";
         document.querySelector("#helpPanel").style.visibility = "hidden";
     }
     console.log("Extras Panel");
@@ -218,12 +249,26 @@ function showExtrasPanel() {
 function showHelpPanel() {
     let helpPanel = document.querySelector("#helpPanel");
     if (helpPanel.style.visibility == "visible") {
-        helpPanel.style.visibility = "hidden";
+        closeHelpPanel();
     } else {
         helpPanel.style.visibility = "visible";
         document.querySelector("#extrasPanel").style.visibility = "hidden";
     }
     console.log("Extras Panel");
+}
+
+// Closes the extras panel
+function closeExtrasPanel() {
+    let extrasPanel = document.querySelector("#extrasPanel");
+    extrasPanel.style.left = "100vw";
+    extrasPanel.style.visibility = "hidden";
+}
+
+// Closes the help panel
+function closeHelpPanel() {
+    let helpPanel = document.querySelector("#helpPanel");
+    helpPanel.style.left = "100vw";
+    helpPanel.style.visibility = "hidden";
 }
 
 // Deletes all data from database
@@ -472,16 +517,33 @@ function updateTrack(data) {
         document.querySelector("#mapArea").append(newPoint);
     }
 
-    // TESTING first/current track point
-    if (inSession) {
-        let testElement = document.querySelector("#mapArea").firstElementChild;
-        testElement.style.backgroundColor = "magenta";
-        testElement.style.width = "1vw";
-        testElement.style.height = "1vw";
-        let testElement2 = document.querySelector("#mapArea").lastElementChild;
-        testElement2.style.backgroundColor = "cyan";
-        testElement2.style.width = "1vw";
-        testElement2.style.height = "1vw";
+    // Set custom first/current track point
+    if (inSession || isUploaded) {
+        // Get first and last track points
+        let firstPoint = document.querySelector("#mapArea").firstElementChild;
+        let lastPoint = document.querySelector("#mapArea").lastElementChild;
+
+        // Create template for new custom point
+        let customPoint = document.createElement("img");
+        customPoint.className = "track";
+        customPoint.style.backgroundColor = "transparent";
+        customPoint.style.borderRadius = "0px";
+        customPoint.style.height = "2vw";
+        customPoint.style.width = "auto";
+        customPoint.style.zIndex = "999999";
+
+        // Apply new finish line point
+        customPoint.src = "trackFinish.png";
+        customPoint.style.left = firstPoint.style.left;
+        customPoint.style.bottom = firstPoint.style.bottom;
+        firstPoint.parentNode.replaceChild(customPoint, firstPoint);
+
+        // Apply new current position point
+        customPoint2 = customPoint.cloneNode();
+        customPoint2.src = "trackLatest.png";
+        customPoint2.style.left = lastPoint.style.left;
+        customPoint2.style.bottom = lastPoint.style.bottom;
+        lastPoint.parentNode.replaceChild(customPoint2, lastPoint);
     }
 }
 

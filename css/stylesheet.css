@@ -25,6 +25,7 @@ body {
     padding: 0px;
     margin: 0px;
     /* user-select: none; */
+    overflow: hidden;
 }
 
 .grid {
@@ -132,6 +133,7 @@ body {
     grid-area: map;
     position: relative;
     margin: 10px !important;
+    overflow: hidden;
 }
 
 .track {
@@ -162,6 +164,8 @@ body {
     background-color: rgba(38, 50, 56, 0.95);
     width: 75vw;
     height: 100vh;
+    /* overflow: scroll; */
+    left: 100vw;
 }
 
 .graphCol {
@@ -176,6 +180,8 @@ body {
     background-color: rgba(38, 50, 56, 0.95);
     width: 75vw;
     height: 100vh;
+    /* overflow: scroll; */
+    left: 100vw;
 }
 
 .helpText {

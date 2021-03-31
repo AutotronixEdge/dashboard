@@ -71,29 +71,20 @@
         <div class="buttons">
             <div class="row">
                 <!-- Start / Stop Button -->
-                <div class="col s4">
+                <div class="col s6">
                     <a
                         id="startStopBtn"
-                        class="btn waves-effect waves-light green darken-4 customBtn"
+                        class="btn waves-effect waves-light green darken-4 col s12"
                         >start</a
                     >
                 </div>
 
                 <!-- Reset Button -->
-                <div class="col s4">
+                <div class="col s6">
                     <a
                         id="resetBtn"
-                        class="btn waves-effect waves-light red darken-4 customBtn"
-                        >reset</a
-                    >
-                </div>
-
-                <!-- Download Button -->
-                <div class="col s4">
-                    <a
-                        class="btn waves-effect waves-light blue darken-4 customBtn"
-                        id="downloadBtn"
-                        >download</a
+                        class="btn waves-effect waves-light red darken-4 col s12"
+                        ><i class="material-icons right">restart_alt</i>reset</a
                     >
                 </div>
 
@@ -102,19 +93,19 @@
                 <!-- Extras Button -->
                 <div class="col s6">
                     <a
-                        class="btn waves-effect waves-light purple darken-4 customBtn"
+                        class="btn waves-effect waves-light purple darken-4 col s12"
                         id="extrasBtn"
                     >
-                        <i class="material-icons left">settings</i>extras</a
+                        <i class="material-icons right">settings</i>extras</a
                     >
                 </div>
 
                 <!-- Help Button -->
                 <div class="col s6">
                     <a
-                        class="btn waves-effect waves-light brown customBtn"
+                        class="btn waves-effect waves-light brown col s12"
                         id="helpBtn"
-                        ><i class="material-icons left">help_outline</i>help</a
+                        ><i class="material-icons right">help_outline</i>help</a
                     >
                 </div>
 
@@ -149,6 +140,9 @@
                 <div class="row"></div>
                 <div class="col s12">
                     <b>EXTRAS PANEL</b>
+                    <a class="btn blue-grey darken-2 right" id="closeExtrasBtn"
+                        ><i class="material-icons">close</i></a
+                    >
                 </div>
             </div>
             <div class="row">
@@ -163,6 +157,7 @@
 
                 <!-- right side -->
                 <div class="col s6">
+                    <!-- Settings -->
                     <blockquote>
                         <h5 class="left-align">Settings</h5>
                         <hr />
@@ -172,7 +167,7 @@
                             <div class="col s12">
                                 <a class="btn blue-grey col s12" id="logoutBtn"
                                     ><i class="material-icons right">logout</i
-                                    >Logout</a
+                                    >logout</a
                                 >
                             </div>
 
@@ -192,7 +187,44 @@
                                 <a
                                     class="btn red lighten-1 col s12"
                                     id="newCodeBtn"
-                                    >Change Code</a
+                                    ><i class="material-icons right">vpn_key</i
+                                    >change code</a
+                                >
+                            </div>
+                        </div>
+                    </blockquote>
+                    <!-- Upload File -->
+                    <blockquote>
+                        <h5 class="left-align">Download / Upload Session</h5>
+                        <hr />
+                        <div class="row"></div>
+                        <div class="row">
+                            <!-- Download Button -->
+                            <div class="col s12">
+                                <a
+                                    class="btn blue darken-4 col s12"
+                                    id="downloadBtn"
+                                    ><i class="material-icons right">download</i
+                                    >download currrent session</a
+                                >
+                            </div>
+                            <div class="row"></div>
+
+                            <!-- Upload JSON -->
+                            <div class="col s8 input-field">
+                                <i class="material-icons prefix"
+                                    >text_snippet</i
+                                >
+                                <input
+                                    placeholder="JSON Text"
+                                    id="jsonText"
+                                    class="white-text"
+                                />
+                            </div>
+                            <div class="col s4 input-field">
+                                <a class="btn blue col s12" id="uploadBtn"
+                                    ><i class="material-icons right">upload</i
+                                    >Upload</a
                                 >
                             </div>
                         </div>
@@ -208,6 +240,9 @@
                 <div class="row"></div>
                 <div class="col s12">
                     <b>HELP PANEL</b>
+                    <a class="btn blue-grey darken-2 right" id="closeHelpBtn"
+                        ><i class="material-icons">close</i></a
+                    >
                 </div>
             </div>
             <!-- Help Content -->
@@ -257,6 +292,18 @@
                                 This panel also allows you to logout, or change
                                 the access code.
                             </p>
+                            <div class="btn blue darken-4">
+                                download current session
+                            </div>
+                            <p>
+                                This button downloads the current working
+                                dataset as a JSON file.
+                            </p>
+                            <div class="btn blue darken-4">upload</div>
+                            <p>
+                                This button uploads the JSON text from the input
+                                field to the left of it.
+                            </p>
                         </blockquote>
                     </div>
 
@@ -292,11 +339,6 @@
                                 This button resets the graphs, table, and track,
                                 then gets the system ready to start a new
                                 session.
-                            </p>
-                            <div class="btn blue darken-4">DOWNLOAD</div>
-                            <p>
-                                This button downloads the current working
-                                dataset as a json file.
                             </p>
                             <div class="btn purple darken-4">EXTRAS</div>
                             <p>
@@ -380,7 +422,7 @@
                         <div class="col s12">
                             <button
                                 id="loginBtn"
-                                class="btn blue-grey customBtn"
+                                class="btn blue-grey col s12"
                                 type="submit"
                                 name="action"
                             >

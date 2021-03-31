@@ -6,6 +6,8 @@ fbUrl = "https://autotronix-test-database-default-rtdb.firebaseio.com/";
 getUrl = "https://dweet.io/get/latest/dweet/for/AutotronixDataTransfer";
 postUrl = "https://dweet.io/dweet/for/AutotronixDataTransfer?";
 
+isUploaded = false;
+
 dweetDataSet = {
     accelX: [],
     accelY: [],
