@@ -67,6 +67,7 @@ async function refresh() {
             // updateTable(lapData);
         }
         updateTrack(dweetDataSet);
+        checkNewLap(dweetDataSet);
     }
 }
 
@@ -179,7 +180,7 @@ function reset(e) {
 
     // TESTING---------------------------------------------------
     // runTestCode();
-    dweetRandomData();
+    // dweetRandomData();
 
     // Reset graphs
     updateGraphs(dweetDataSet);
@@ -228,6 +229,7 @@ function uploadJSON() {
 
     updateGraphs(uploadedDataset);
     updateTrack(uploadedDataset);
+    checkNewLap(uploadedDataset);
 
     console.log("JSON Data Uploaded");
 }
@@ -252,9 +254,10 @@ function showHelpPanel() {
         closeHelpPanel();
     } else {
         helpPanel.style.visibility = "visible";
+        helpPanel.style.left = "0vw";
         document.querySelector("#extrasPanel").style.visibility = "hidden";
     }
-    console.log("Extras Panel");
+    console.log("Help Panel");
 }
 
 // Closes the extras panel
@@ -634,8 +637,31 @@ function newLap(newData) {
 
     let isNewLap = false;
 
+    // TESTING lap
+
     for (let i = 0; i < dweetDataSet.lat.length; i++) {
-        if (dweetDataSet.lat[i] == newLat && dweetDataSet.lon[i] == newLon) {
+        // Check if out of starting zone
+        if (
+            Math.abs(newLat / dweetDataSet.lat[0]) > 0.0000025 &&
+            Math.abs(newLon / dweetDataSet.lon[0]) > 0.0000025 &&
+            atLapStart == true
+        ) {
+            atLapStart = false;
+            console.log("Left Start Area . . .");
+        } else if (
+            Math.abs(newLat / dweetDataSet.lat[0]) < 0.0000025 &&
+            Math.abs(newLon / dweetDataSet.lon[0]) < 0.0000025 &&
+            atLapStart == false
+        ) {
+            console.log("Re-Entered Start Area . . .");
+        }
+
+        // Update Table
+        if (
+            dweetDataSet.lat[i] == newLat &&
+            dweetDataSet.lon[i] == newLon &&
+            atLapStart == false
+        ) {
             isNewLap = true;
             lapData.time.push(dweetDataSet.time[dweetDataSet.time.length - 1]);
             updateTable(lapData);
@@ -647,6 +673,63 @@ function newLap(newData) {
     // TESTING
     // Update lap data in database
     // patchData(fbUrl, "", "Dataset/" + sessionId, dweetDataSet);
+
+    return isNewLap;
+}
+
+// Checks if a new lap has started and updates lap data
+function checkNewLap(data) {
+    let isNewLap = false;
+    console.log("test", data);
+
+    // TESTING lap
+    for (let i = 0; i < data.lat.length; i++) {
+        let newLat = data.lat[i];
+        let newLon = data.lon[i];
+        let distance = getDistance2(
+            data.lat[0],
+            data.lon[0],
+            data.lat[i],
+            data.lon[i]
+        );
+
+        // Check if leaving starting zone
+        if (distance > 2 && atLapStart) {
+            atLapStart = false;
+            console.log("Left Starting Area . . .");
+        }
+
+        // Check if entering starting zone
+        if (distance < 2 && !atLapStart) {
+            atLapStart = true;
+            isNewLap = true;
+            console.log("Re-Entered Starting Area . . .");
+        }
+
+        // console.log(newLat, newLon);
+
+        if (isNewLap && atLapStart) {
+            lapData.time.push(data.time[data.time.length - 1]);
+
+            console.log(
+                "New Lap at",
+                i,
+                "of",
+                newLat,
+                "and",
+                newLon,
+                "with",
+                data.lat[0],
+                "and",
+                data.lon[0],
+                distance
+            );
+        }
+    }
+
+    if (isNewLap) {
+        updateTable(lapData);
+    }
 
     return isNewLap;
 }
@@ -663,58 +746,6 @@ function calcVel() {
         velocity = 0;
     }
     return velocity;
-}
-
-// Gets data from latest dweet and updates current dataset
-function extractDweet(dweet) {
-    // Add dweet content to dataset if not a repeat
-    if (jQuery.isEmptyObject(dweet)) {
-        console.log("No Data Received");
-        return false;
-    } else if (!dweetDataSet.time.includes(Object.keys(dweet)[0] / 1000)) {
-        for (var prop in dweet) {
-            let propData = dweet[prop].split(",");
-
-            // Check if new lap
-            newLap(propData);
-
-            // store dataset values
-            dweetDataSet.wheel.push(propData[0]);
-            dweetDataSet.gas.push(propData[1]);
-            dweetDataSet.brake.push(propData[2]);
-            dweetDataSet.accelX.push(propData[3]);
-            dweetDataSet.accelY.push(propData[4]);
-            dweetDataSet.accelZ.push(propData[5]);
-            dweetDataSet.lat.push(propData[6]);
-            dweetDataSet.lon.push(propData[7]);
-            dweetDataSet.vel.push((propData[8] / 1000) * 2.237);
-            dweetDataSet.time.push(prop / 1000);
-
-            // calc and store velocity
-            let velocity = calcVel();
-            // dweetDataSet.vel.push(velocity.toFixed(2));
-        }
-
-        patchData(fbUrl, "", racerId + "/Dataset/" + sessionId, dweetDataSet);
-
-        console.log("New Data Received");
-        return true;
-    } else {
-        console.log("Repeat Data Received");
-        return false;
-    }
-}
-
-// Gets latest dweet content
-async function getDweet(url = "") {
-    const response = await fetch(url);
-    return response.json();
-}
-
-// Posts data to dweet
-async function postDweet(url = "", postData = "") {
-    const response = await fetch(url + postData);
-    return response.json();
 }
 
 // Calculates the distance from Lon and Lat data points in a dataset
@@ -738,6 +769,58 @@ function getDistance(coords) {
                 )
         );
     return distance;
+}
+
+// Gets data from latest dweet and updates current dataset
+function extractDweet(dweet) {
+    // Add dweet content to dataset if not a repeat
+    if (jQuery.isEmptyObject(dweet)) {
+        console.log("No Data Received");
+        return false;
+    } else if (!dweetDataSet.time.includes(Object.keys(dweet)[0] / 1000)) {
+        for (var prop in dweet) {
+            let propData = dweet[prop].split(",");
+
+            // Check if new lap
+            // newLap(propData);
+
+            // store dataset values
+            dweetDataSet.wheel.push(propData[0]);
+            dweetDataSet.gas.push(propData[1]);
+            dweetDataSet.brake.push(propData[2]);
+            dweetDataSet.accelX.push(propData[3]);
+            dweetDataSet.accelY.push(propData[4]);
+            dweetDataSet.accelZ.push(propData[5]);
+            dweetDataSet.lat.push(propData[6]);
+            dweetDataSet.lon.push(propData[7]);
+            dweetDataSet.vel.push((propData[8] / 1000) * 2.237);
+            dweetDataSet.time.push(prop / 1000);
+
+            // calc and store velocity
+            // let velocity = calcVel();
+            // dweetDataSet.vel.push(velocity.toFixed(2));
+        }
+
+        patchData(fbUrl, "", racerId + "/Dataset/" + sessionId, dweetDataSet);
+
+        console.log("New Data Received");
+        return true;
+    } else {
+        console.log("Repeat Data Received");
+        return false;
+    }
+}
+
+// Gets latest dweet content
+async function getDweet(url = "") {
+    const response = await fetch(url);
+    return response.json();
+}
+
+// Posts data to dweet
+async function postDweet(url = "", postData = "") {
+    const response = await fetch(url + postData);
+    return response.json();
 }
 
 // Gets data from database

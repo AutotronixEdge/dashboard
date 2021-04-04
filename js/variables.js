@@ -3,10 +3,13 @@ racerId = "default_racer";
 accessCode = "";
 
 fbUrl = "https://autotronix-test-database-default-rtdb.firebaseio.com/";
-getUrl = "https://dweet.io/get/latest/dweet/for/AutotronixDataTransfer";
-postUrl = "https://dweet.io/dweet/for/AutotronixDataTransfer?";
+getUrl = "https://dweet.io/get/latest/dweet/for/AutoDT";
+postUrl = "https://dweet.io/dweet/for/AutoDT?";
 
+inSession = false;
 isUploaded = false;
+
+atLapStart = true;
 
 dweetDataSet = {
     accelX: [],
