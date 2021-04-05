@@ -15,7 +15,7 @@ function randomDweet() {
     let currentTime = new Date().getTime();
     // let currentTime = 0;
 
-    for (let i = 0; i < 51; i++) {
+    for (let i = 0; i < 71; i++) {
         // ?time1=d1,d2,d3,d4,d5,d6,d7&time2=...
         // currentTime += 100;
         // let tempString =
@@ -40,7 +40,7 @@ function randomDweet() {
         //     Math.floor(Math.random() * Math.floor(vel)) +
         //     "&";
 
-        currentTime += (2 * Math.PI) / 20;
+        currentTime += (2 * Math.PI) / 20 + Math.random() * 0.0001;
         // TESTING
         let tempString =
             currentTime +
@@ -51,7 +51,7 @@ function randomDweet() {
             "," +
             Math.cos(currentTime) * 10 +
             "," +
-            Math.cos(currentTime) * 80000 +
+            (Math.cos(currentTime) * 80000 + 80000) +
             "&";
 
         dataString += tempString;
@@ -73,7 +73,7 @@ function dweetRandomData() {
 }
 
 // Calculates the distance from Lon and Lat data points in a dataset
-function getDistance2(lat1, lon1, lat2, lon2) {
+function getDistance(lat1, lon1, lat2, lon2) {
     coords = {
         lat: [lat1, lat2],
         lon: [lon1, lon2],
@@ -102,46 +102,88 @@ function getDistance2(lat1, lon1, lat2, lon2) {
 // distance = getDistance2();
 // console.log(distance);
 
-// Create WebSocket connection.
-const socket = new WebSocket("ws://18.237.79.7:3000");
+// Sets up websocket connection and event listeners to collect data
+function setupWebsocket(url) {
+    // Create WebSocket connection.
+    socket = new WebSocket(url);
 
-// Connection opened
-socket.addEventListener("open", function (event) {
-    // socket.send("Hello Server!");
-    console.log("Websocket Connected");
-});
-thisdata = "";
-// Listen for messages
-socket.addEventListener("message", function (event) {
-    thisdata = event.data;
-    parsedData = thisdata;
-    try {
-        // parsedData = JSON.parse(thisdata);
-    } catch (e) {
-        console.log("Parse Error . . .");
-    }
-    try {
-        parseData(parsedData);
-    } catch (e) {
-        console.log("Can't Parse Data . . .");
-    }
-    updateGraphs(dweetDataSet);
-    // console.log(
-    //     "Received:",
-    //     event.data,
-    //     "at",
-    //     new Date().getHours() +
-    //         ":" +
-    //         new Date().getMinutes() +
-    //         ":" +
-    //         new Date().getSeconds() +
-    //         ":" +
-    //         new Date().getMilliseconds()
-    // );
-});
+    // Connection opened
+    socket.addEventListener("open", function (event) {
+        // socket.send("Hello Server!");
+        console.log("Websocket Connected");
+    });
+
+    // Listen for messages
+    socket.addEventListener("message", function (event) {
+        if (inSession) {
+            console.log("Data Recieved");
+            message = event.data;
+
+            if (message == '{"connection" :"ok"}') {
+                console.log("Connection: OK");
+            } else {
+                try {
+                    parseData(message);
+                } catch (e) {
+                    console.log("Can't Parse Data . . .");
+                }
+                // updateGraphs(dweetDataSet);
+                console.log(
+                    "Received:",
+                    event.data,
+                    "at",
+                    new Date().getHours() +
+                        ":" +
+                        new Date().getMinutes() +
+                        ":" +
+                        new Date().getSeconds() +
+                        ":" +
+                        new Date().getMilliseconds()
+                );
+            }
+        }
+    });
+
+    socket.addEventListener("close", (event) => {
+        console.log("The connection has been closed successfully.");
+    });
+}
 
 function parseData(data) {
+    // let packet = data.split("&");
+    // console.log(packet);
+    // packet = packet.filter(function (el) {
+    //     return el != null;
+    // });
+    // console.log(packet);
+    // for (let i = 0; i < packet.length - 1; i++) {
+    //     let dataArray = packet[i].split(",");
+    //     // if (
+    //     //     dataArray.filter(function (el) {
+    //     //         return el != null;
+    //     //     })
+    //     // ) {
+    //     //     break;
+    //     // }
+    //     dweetDataSet.time.push(dataArray[0] / 1000);
+    //     dweetDataSet.wheel.push(dataArray[1]);
+    //     dweetDataSet.gas.push(dataArray[2]);
+    //     dweetDataSet.brake.push(dataArray[3]);
+    //     dweetDataSet.accelX.push(dataArray[4]);
+    //     dweetDataSet.accelY.push(dataArray[5]);
+    //     dweetDataSet.accelZ.push(dataArray[6]);
+    //     dweetDataSet.lat.push(dataArray[7]);
+    //     dweetDataSet.lon.push(dataArray[8]);
+    //     dweetDataSet.vel.push((dataArray[9] / 1000) * 2.237);
+    // }
+
     let dataArray = data.split(",");
+    // console.log(dataArray);
+    // packet = packet.filter(function (el) {
+    //     return el != null;
+    // });
+
+    dweetDataSet.time.push(dataArray[0] / 1000);
     dweetDataSet.wheel.push(dataArray[1]);
     dweetDataSet.gas.push(dataArray[2]);
     dweetDataSet.brake.push(dataArray[3]);
@@ -151,5 +193,5 @@ function parseData(data) {
     dweetDataSet.lat.push(dataArray[7]);
     dweetDataSet.lon.push(dataArray[8]);
     dweetDataSet.vel.push((dataArray[9] / 1000) * 2.237);
-    dweetDataSet.time.push(dataArray[0] / 1000);
+    dweetDataSet.bat.push(dataArray[10]);
 }

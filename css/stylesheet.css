@@ -180,7 +180,7 @@ body {
     background-color: rgba(38, 50, 56, 0.95);
     width: 75vw;
     height: 100vh;
-    /* overflow: scroll; */
+    overflow: scroll;
     left: 100vw;
 }
 
