@@ -33,6 +33,18 @@
         <script type="text/javascript" src="js/materialize.min.js"></script>
         <script src="js/variables.js"></script>
         <script src="js/testFunctions.js"></script>
+
+        <!-- Mapkick -->
+        <link
+            href="https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.css"
+            rel="stylesheet"
+        />
+        <script src="https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js"></script>
+        <script>
+            mapboxgl.accessToken =
+                "pk.eyJ1IjoiYmlnZ2llOTU5OCIsImEiOiJja25iMXZha20wajU4MnptaWsxdGp0ZTBwIn0.MsG2XMdeaIOLTAFKjt4FaA";
+        </script>
+        <script src="js/mapkick.js"></script>
     </head>
 
     <body class="grid">
@@ -108,17 +120,6 @@
                         ><i class="material-icons right">help_outline</i>help</a
                     >
                 </div>
-
-                <div class="row"></div>
-
-                <!-- TESTING -->
-                <div class="col s12">
-                    <a
-                        class="btn waves-effect waves-light blue-grey customBtn"
-                        id="flushBtn"
-                        >flush database</a
-                    >
-                </div>
             </div>
         </div>
 
@@ -129,8 +130,15 @@
         </div>
 
         <!-- Misc -->
-        <div class="misc">
+        <div class="misc valign-wrapper">
+            <!-- Logo -->
             <img id="logo" src="autotronixLogoOpaque.png" />
+
+            <!-- Track Hover Area -->
+            <div
+                id="trackHoverArea"
+                class="card-panel blue-grey darken-2"
+            ></div>
         </div>
 
         <!-- Extras Panel -->
@@ -146,16 +154,17 @@
                 </div>
             </div>
             <div class="row">
-                <!-- TESTING - left side -->
+                <!-- left side -->
                 <div class="col s6">
                     <!-- Battery Level -->
-                    <div class="row">
+                    <!-- TESTING battery visibility: hidden -->
+                    <div class="row" style="visibility: hidden">
                         <div class="col s12">
                             <b>BATTERY LEVEL</b>
                             <div class="row"></div>
                             <div class="col s12 blue-grey" style="padding: 5px">
                                 <div
-                                    class="blue-grey lighten-4 blue-grey-text valign-wrapper"
+                                    class="blue-grey lighten-4 blue-grey-text text-darken-4 valign-wrapper"
                                     id="batteryBar"
                                     style="padding-left: 10px"
                                 >
@@ -171,6 +180,12 @@
                     <div class="row">
                         <div class="col s11 graphCol" id="accelZGraph">
                             <b>Z-AXIS ACCELERATION</b>
+                        </div>
+                    </div>
+                    <!-- Mapkick -->
+                    <div class="row">
+                        <div class="col s12">
+                            <div id="map" style="height: 400px"></div>
                         </div>
                     </div>
                 </div>
@@ -211,9 +226,19 @@
                                     >change code</a
                                 >
                             </div>
+
+                            <!-- Flush Database -->
+                            <div class="col s12">
+                                <a
+                                    class="btn grey darken-4 customBtn"
+                                    id="flushBtn"
+                                    >flush database</a
+                                >
+                            </div>
                         </div>
                     </blockquote>
-                    <!-- Upload File -->
+
+                    <!-- Download / Upload JSON -->
                     <blockquote>
                         <h5 class="left-align">Download / Upload Session</h5>
                         <hr />
@@ -245,6 +270,44 @@
                                 <a class="btn blue col s12" id="uploadBtn"
                                     ><i class="material-icons right">upload</i
                                     >Upload</a
+                                >
+                            </div>
+                        </div>
+                    </blockquote>
+
+                    <!-- Select Session -->
+                    <blockquote>
+                        <h5 class="left-align">Session Selector</h5>
+                        <hr />
+                        <div class="row"></div>
+                        <div class="row">
+                            <!-- Download Button -->
+                            <div class="col s12">
+                                <a
+                                    class="btn dropdown-trigger teal col s12"
+                                    href="#"
+                                    data-target="sessionList"
+                                    id="selectSessionBtn"
+                                    ><i class="material-icons right"
+                                        >arrow_drop_down</i
+                                    >choose a session</a
+                                >
+                                <ul
+                                    id="sessionList"
+                                    class="dropdown-content"
+                                ></ul>
+                            </div>
+
+                            <div class="row"></div>
+
+                            <!-- Compare Toggle -->
+                            <div class="switch">
+                                <label
+                                    >Don't Compare<input
+                                        type="checkbox"
+                                        id="compToggle"
+                                    />
+                                    <span class="lever"></span>Compare</label
                                 >
                             </div>
                         </div>
@@ -308,25 +371,37 @@
                             <p>
                                 This panel shows the z-axis acceleration graph.
                             </p>
+                            <div class="btn blue-grey">logout</div>
+                            <div class="btn red lighten-1">change code</div>
                             <p>
                                 This panel also allows you to logout, or change
                                 the access code.
                             </p>
+                            <div class="btn grey darken-4">flush database</div>
+                            <p>
+                                This button erases the database for the current
+                                user, including all previous sessions.
+                            </p>
                             <div class="btn blue darken-4">
                                 download current session
                             </div>
+                            <div class="btn blue">upload</div>
                             <p>
-                                This button downloads the current working
-                                dataset as a JSON file.
+                                These buttons allow you to download the current
+                                working dataset as a JSON file, and upload JSON
+                                content to be displayed.
                             </p>
-                            <div class="btn blue darken-4">upload</div>
+                            <div class="btn teal">choose a session</div>
                             <p>
-                                This button uploads the JSON text from the input
-                                field to the left of it.
+                                This button lets you load a past session from
+                                the database.
                             </p>
                         </blockquote>
                     </div>
+                </div>
 
+                <!-- Right Side -->
+                <div class="col m12 l6">
                     <!-- Login -->
                     <div class="col s12">
                         <blockquote>
@@ -336,40 +411,35 @@
                                 The Racer ID is what is determines how the
                                 session data is stored in the database.
                             </p>
-                            <p>The Access Code is set in stone.</p>
+                            <p>
+                                The Access Code is the same for all users, but
+                                can be changed in the extras panel.
+                            </p>
                         </blockquote>
                     </div>
-                </div>
 
-                <!-- Right Side -->
-                <div class="col m12 l6">
                     <!-- Buttons -->
                     <div class="col s12">
                         <blockquote>
                             <h5>Buttons</h5>
                             <hr />
-                            <div class="btn green darken-4">START</div>
-                            <div class="btn orange darken-4">STOP</div>
+                            <div class="btn green darken-4">start</div>
+                            <div class="btn orange darken-4">stop</div>
                             <p>
                                 This button starts and stops the current
                                 session.
                             </p>
-                            <div class="btn red darken-4">RESET</div>
+                            <div class="btn red darken-4">reset</div>
                             <p>
                                 This button resets the graphs, table, and track,
                                 then gets the system ready to start a new
                                 session.
                             </p>
-                            <div class="btn purple darken-4">EXTRAS</div>
+                            <div class="btn purple darken-4">extras</div>
                             <p>
                                 This buttons shows the extras panel where
                                 miscellaneous graphs and information can be
                                 shown.
-                            </p>
-                            <div class="btn brown">FLUSH DATABASE</div>
-                            <p>
-                                This button erases the database, including all
-                                previous sessions.
                             </p>
                         </blockquote>
                     </div>
@@ -379,24 +449,36 @@
                         <blockquote>
                             <h5>Track</h5>
                             <hr />
-                            <p>This section plots the GPS position history.</p>
                             <p>
-                                The
-                                <b class="purple-text text-lighten-2"
-                                    >magenta</b
-                                >
-                                point indicates the starting position of the
-                                session.
+                                This section plots the GPS position history.
+                                Hovering over a point will display a panel in
+                                the bottom right section of the page with the
+                                statistics at that point.
                             </p>
                             <p>
                                 The
-                                <b class="cyan-text">cyan</b> point indicates
-                                the latest position of the session.
+                                <img
+                                    src="trackFinish.png"
+                                    style="width: 30px"
+                                />
+                                point indicates the starting position on the
+                                track.
+                            </p>
+                            <p>
+                                The
+                                <img
+                                    src="trackLatest.png"
+                                    style="width: 30px"
+                                />
+                                point indicates the latest position on the
+                                track.
                             </p>
                             <p>
                                 The color of the remaining points indicates the
-                                speed bracket at that location, with red being
-                                the slowest, and green being the fastest.
+                                speed bracket at that location, with
+                                <b class="red-text">red</b> being the slowest,
+                                and <b class="green-text">green</b> being the
+                                fastest.
                             </p>
                         </blockquote>
                     </div>

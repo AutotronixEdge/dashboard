@@ -134,10 +134,11 @@ body {
     position: relative;
     margin: 10px !important;
     overflow: hidden;
+    height: 60%;
 }
 
 .track {
-    background-color: cyan;
+    /* background-color: cyan; */
     width: 0.5vw;
     height: 0.5vw;
     border-radius: 0.5vw;
@@ -155,6 +156,17 @@ body {
     width: 50%;
     bottom: 0;
     right: 25%;
+}
+
+#trackHoverArea {
+    visibility: hidden;
+    /* width: 90%;
+    height: 90%; */
+    /* position: absolute; */
+    z-index: 999;
+    margin: auto;
+    /* right: 0px;
+    bottom: 0px; */
 }
 
 /* Extras Panel */
@@ -194,7 +206,7 @@ body {
     visibility: visible;
 
     /* TESTING */
-    visibility: hidden;
+    /* visibility: hidden; */
 
     background-color: rgba(38, 50, 56, 0.95);
     width: 100vw;

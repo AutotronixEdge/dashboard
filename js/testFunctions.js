@@ -1,76 +1,79 @@
 // Test Functions
 // Generates random dweet data
-function randomDweet() {
-    wheel = 50;
-    gas = 70;
-    brake = 20;
-    accelX = 5;
-    accelY = 10;
-    accelZ = 10;
-    lat = 20;
-    lon = 20;
-    vel = 90000;
+// TESTING
+// function randomDweet() {
+//     wheel = 50;
+//     gas = 70;
+//     brake = 20;
+//     accelX = 5;
+//     accelY = 10;
+//     accelZ = 10;
+//     lat = 20;
+//     lon = 20;
+//     vel = 90000;
 
-    let dataString = "";
-    let currentTime = new Date().getTime();
-    // let currentTime = 0;
+//     let dataString = "";
+//     let currentTime = new Date().getTime();
+//     // let currentTime = 0;
 
-    for (let i = 0; i < 71; i++) {
-        // ?time1=d1,d2,d3,d4,d5,d6,d7&time2=...
-        // currentTime += 100;
-        // let tempString =
-        //     currentTime +
-        //     "=" +
-        //     Math.floor(Math.random() * Math.floor(wheel)) +
-        //     "," +
-        //     Math.floor(Math.random() * Math.floor(gas)) +
-        //     "," +
-        //     Math.floor(Math.random() * Math.floor(brake)) +
-        //     "," +
-        //     Math.floor(Math.random() * Math.floor(accelX)) +
-        //     "," +
-        //     Math.floor(Math.random() * Math.floor(accelY)) +
-        //     "," +
-        //     Math.floor(Math.random() * Math.floor(accelZ)) +
-        //     "," +
-        //     Math.floor(Math.random() * Math.floor(lat)) +
-        //     "," +
-        //     Math.floor(Math.random() * Math.floor(lon)) +
-        //     "," +
-        //     Math.floor(Math.random() * Math.floor(vel)) +
-        //     "&";
+//     for (let i = 0; i < 71; i++) {
+//         // ?time1=d1,d2,d3,d4,d5,d6,d7&time2=...
+//         // currentTime += 100;
+//         // let tempString =
+//         //     currentTime +
+//         //     "=" +
+//         //     Math.floor(Math.random() * Math.floor(wheel)) +
+//         //     "," +
+//         //     Math.floor(Math.random() * Math.floor(gas)) +
+//         //     "," +
+//         //     Math.floor(Math.random() * Math.floor(brake)) +
+//         //     "," +
+//         //     Math.floor(Math.random() * Math.floor(accelX)) +
+//         //     "," +
+//         //     Math.floor(Math.random() * Math.floor(accelY)) +
+//         //     "," +
+//         //     Math.floor(Math.random() * Math.floor(accelZ)) +
+//         //     "," +
+//         //     Math.floor(Math.random() * Math.floor(lat)) +
+//         //     "," +
+//         //     Math.floor(Math.random() * Math.floor(lon)) +
+//         //     "," +
+//         //     Math.floor(Math.random() * Math.floor(vel)) +
+//         //     "&";
 
-        currentTime += (2 * Math.PI) / 20 + Math.random() * 0.0001;
-        // TESTING
-        let tempString =
-            currentTime +
-            "=" +
-            Math.sin(currentTime * 10) +
-            ",10,10,10,10,10," +
-            Math.sin(currentTime) * 10 +
-            "," +
-            Math.cos(currentTime) * 10 +
-            "," +
-            (Math.cos(currentTime) * 80000 + 80000) +
-            "&";
+//         currentTime += (2 * Math.PI) / 20 + Math.random() * 0.0001;
+//         // TESTING
+//         let tempString =
+//             currentTime +
+//             "=" +
+//             Math.sin(currentTime * 10) +
+//             ",10,10,10,10,10," +
+//             Math.sin(currentTime) * 10 +
+//             "," +
+//             Math.cos(currentTime) * 10 +
+//             "," +
+//             (Math.cos(currentTime) * 80000 + 80000) +
+//             "&";
 
-        dataString += tempString;
-    }
+//         dataString += tempString;
+//     }
 
-    return dataString;
-}
+//     return dataString;
+// }
 
-function runTestCode() {
-    for (let i = 0; i < latLon.length; i++) {
-        let tempLatLon = latLon[i].split(",");
-        dweetDataSet.lat.push(tempLatLon[0]);
-        dweetDataSet.lon.push(tempLatLon[1]);
-    }
-}
+// TESTING
+// function runTestCode() {
+//     for (let i = 0; i < latLon.length; i++) {
+//         let tempLatLon = latLon[i].split(",");
+//         dataset.lat.push(tempLatLon[0]);
+//         dataset.lon.push(tempLatLon[1]);
+//     }
+// }
 
-function dweetRandomData() {
-    postDweet(postUrl, randomDweet());
-}
+// TESTING
+// function dweetRandomData() {
+//     postDweet(postUrl, randomDweet());
+// }
 
 // Calculates the distance from Lon and Lat data points in a dataset
 function getDistance(lat1, lon1, lat2, lon2) {
@@ -101,7 +104,7 @@ function getDistance(lat1, lon1, lat2, lon2) {
 
 // distance = getDistance2();
 // console.log(distance);
-
+// socket = new WebSocket(wsUrl);
 // Sets up websocket connection and event listeners to collect data
 function setupWebsocket(url) {
     // Create WebSocket connection.
@@ -109,14 +112,13 @@ function setupWebsocket(url) {
 
     // Connection opened
     socket.addEventListener("open", function (event) {
-        // socket.send("Hello Server!");
+        function getSocket(socket) {}
         console.log("Websocket Connected");
     });
 
     // Listen for messages
     socket.addEventListener("message", function (event) {
         if (inSession) {
-            console.log("Data Recieved");
             message = event.data;
 
             if (message == '{"connection" :"ok"}') {
@@ -127,19 +129,19 @@ function setupWebsocket(url) {
                 } catch (e) {
                     console.log("Can't Parse Data . . .");
                 }
-                // updateGraphs(dweetDataSet);
-                console.log(
-                    "Received:",
-                    event.data,
-                    "at",
-                    new Date().getHours() +
-                        ":" +
-                        new Date().getMinutes() +
-                        ":" +
-                        new Date().getSeconds() +
-                        ":" +
-                        new Date().getMilliseconds()
-                );
+                // updateGraphs(dataset);
+                // console.log(
+                //     "Received:",
+                //     event.data,
+                //     "at",
+                //     new Date().getHours() +
+                //         ":" +
+                //         new Date().getMinutes() +
+                //         ":" +
+                //         new Date().getSeconds() +
+                //         ":" +
+                //         new Date().getMilliseconds()
+                // );
             }
         }
     });
@@ -150,48 +152,44 @@ function setupWebsocket(url) {
 }
 
 function parseData(data) {
-    // let packet = data.split("&");
-    // console.log(packet);
-    // packet = packet.filter(function (el) {
-    //     return el != null;
-    // });
-    // console.log(packet);
-    // for (let i = 0; i < packet.length - 1; i++) {
-    //     let dataArray = packet[i].split(",");
-    //     // if (
-    //     //     dataArray.filter(function (el) {
-    //     //         return el != null;
-    //     //     })
-    //     // ) {
-    //     //     break;
-    //     // }
-    //     dweetDataSet.time.push(dataArray[0] / 1000);
-    //     dweetDataSet.wheel.push(dataArray[1]);
-    //     dweetDataSet.gas.push(dataArray[2]);
-    //     dweetDataSet.brake.push(dataArray[3]);
-    //     dweetDataSet.accelX.push(dataArray[4]);
-    //     dweetDataSet.accelY.push(dataArray[5]);
-    //     dweetDataSet.accelZ.push(dataArray[6]);
-    //     dweetDataSet.lat.push(dataArray[7]);
-    //     dweetDataSet.lon.push(dataArray[8]);
-    //     dweetDataSet.vel.push((dataArray[9] / 1000) * 2.237);
-    // }
-
     let dataArray = data.split(",");
-    // console.log(dataArray);
-    // packet = packet.filter(function (el) {
-    //     return el != null;
-    // });
+    if (
+        Number.isInteger(Math.floor(dataArray[0])) &&
+        Number.isInteger(Math.floor(dataArray[1])) &&
+        Number.isInteger(Math.floor(dataArray[2])) &&
+        Number.isInteger(Math.floor(dataArray[3])) &&
+        Number.isInteger(Math.floor(dataArray[4])) &&
+        Number.isInteger(Math.floor(dataArray[5])) &&
+        Number.isInteger(Math.floor(dataArray[6])) &&
+        Number.isInteger(Math.floor(dataArray[7]))
+        // Number.isInteger(Math.floor(dataArray[8])) &&
+        // Number.isInteger(Math.floor(dataArray[9])) &&
+        // Number.isInteger(Math.floor(dataArray[10])) &&
+        // Number.isInteger(Math.floor(dataArray[11])) &&
+        // Number.isInteger(Math.floor(dataArray[12])) &&
+        // Number.isInteger(Math.floor(dataArray[13])) &&
+        // Number.isInteger(Math.floor(dataArray[14])) &&
+        // Number.isInteger(Math.floor(dataArray[15]))
+    ) {
+        dataset.time.push(dataArray[0] / 1000);
+        dataset.wheel.push(dataArray[1]);
+        dataset.accelX.push(dataArray[2]);
+        dataset.accelY.push(dataArray[3]);
+        dataset.accelZ.push(dataArray[4]);
+        dataset.lat.push(dataArray[5]);
+        dataset.lon.push(dataArray[6]);
+        dataset.vel.push(dataArray[7]);
 
-    dweetDataSet.time.push(dataArray[0] / 1000);
-    dweetDataSet.wheel.push(dataArray[1]);
-    dweetDataSet.gas.push(dataArray[2]);
-    dweetDataSet.brake.push(dataArray[3]);
-    dweetDataSet.accelX.push(dataArray[4]);
-    dweetDataSet.accelY.push(dataArray[5]);
-    dweetDataSet.accelZ.push(dataArray[6]);
-    dweetDataSet.lat.push(dataArray[7]);
-    dweetDataSet.lon.push(dataArray[8]);
-    dweetDataSet.vel.push((dataArray[9] / 1000) * 2.237);
-    dweetDataSet.bat.push(dataArray[10]);
+        // dataset.time.push(dataArray[8] / 1000);
+        // dataset.wheel.push(dataArray[9]);
+        // dataset.accelX.push(dataArray[10]);
+        // dataset.accelY.push(dataArray[11]);
+        // dataset.accelZ.push(dataArray[12]);
+        // dataset.lat.push(dataArray[13]);
+        // dataset.lon.push(dataArray[14]);
+        // dataset.vel.push(dataArray[15]);
+    } else {
+        // console.log("garbage data collected");
+        garbageData++;
+    }
 }

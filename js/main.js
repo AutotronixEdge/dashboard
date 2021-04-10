@@ -5,6 +5,10 @@ async function startup() {
 
     // Setup event listeners
     // Login
+    document.querySelector("#racer_id").addEventListener("keyup", checkEnter);
+    document
+        .querySelector("#access_code")
+        .addEventListener("keyup", checkEnter);
     document.querySelector("#loginBtn").addEventListener("click", login);
     // Extras
     document.querySelector("#logoutBtn").addEventListener("click", logout);
@@ -15,6 +19,12 @@ async function startup() {
         .querySelector("#closeExtrasBtn")
         .addEventListener("click", closeExtrasPanel);
     document.querySelector("#uploadBtn").addEventListener("click", uploadJSON);
+    $(".dropdown-trigger").dropdown();
+    document
+        .querySelector("#compToggle")
+        .addEventListener("click", function () {
+            isDataCompare = document.querySelector("#compToggle").checked;
+        });
     // Help
     document
         .querySelector("#closeHelpBtn")
@@ -59,31 +69,58 @@ async function startup() {
 
 // Main loop to get and display data
 async function refresh() {
-    // dweetData = await getDweet(getUrl);
-    // dweetContent = dweetData.with[0].content;
-    // let isNewData = extractDweet(dweetContent);
+    // // TESTING
+    // if (!isUploaded) {
+    //     dweetData = await getDweet(getUrl);
+    //     dweetContent = dweetData.with[0].content;
+    //     let isNewData = extractDweet(dweetContent);
 
-    // if (isNewData && !jQuery.isEmptyObject(dweetContent)) {
-    //     updateGraphs(dweetDataSet);
-    //     if (lapData.isNewLap) {
-    //         // updateTable(lapData);
+    //     if (isNewData && !jQuery.isEmptyObject(dweetContent)) {
+    //         updateGraphs(dataset);
+    //         updateTrack(dataset);
+    //         checkNewLap(dataset);
     //     }
-    //     updateTrack(dweetDataSet);
-    //     checkNewLap(dweetDataSet);
     // }
 
-    if (!jQuery.isEmptyObject(dweetDataSet.time)) {
-        updateGraphs(dweetDataSet);
-        updateTrack(dweetDataSet);
-        checkNewLap(dweetDataSet);
+    if (!jQuery.isEmptyObject(dataset.time)) {
+        updateGraphs(dataset);
+        updateTrack(dataset);
+        checkNewLap(dataset);
+        newDataReceived = true;
+
+        // TESTING - new track system
+        let latLonPoints = [];
+        for (let i = 0; i < dataset.lat.length; i++) {
+            latLonPoints.push({
+                latitude: dataset.lat[i],
+                longitude: dataset.lon[i],
+                tooltip: dataset.lat[i] + "," + dataset.lon[i],
+            });
+        }
+        new Mapkick.Map("map", latLonPoints);
+
+        // TESTING
+        // patchData(fbUrl, "", racerId + "/Dataset/" + sessionId, dataset);
+    }
+}
+
+// Checks if enter is pressed on login fields
+function checkEnter(e) {
+    if (e.keyCode === 13) {
+        // Cancel the default action, if needed
+        e.preventDefault();
+        // Trigger login button
+        document.getElementById("loginBtn").click();
     }
 }
 
 // Login to the site
-function login() {
+async function login() {
     // Get form values
     let idForm = document.querySelector("#racer_id");
     let codeForm = document.querySelector("#access_code");
+    accessCode = await getData(fbUrl, "/Settings");
+    accessCode = accessCode.access_code;
 
     // Check access code
     if (codeForm.value == accessCode) {
@@ -101,6 +138,10 @@ function login() {
             html: "Logged In as " + racerId,
             classes: "green",
         });
+
+        isLoggedIn = true;
+
+        setupSessionSelector();
 
         console.log(racerId, "logged in");
     } else {
@@ -129,6 +170,10 @@ function logout() {
         classes: "green",
     });
 
+    isLoggedIn = false;
+
+    closeExtrasPanel();
+
     console.log(racerId, "logged out");
 }
 
@@ -136,6 +181,7 @@ function logout() {
 function newAccessCode() {
     let codeText = document.querySelector("#new_access_code");
     accessCode = codeText.value;
+    patchData(fbUrl, "/Settings", "access_code", accessCode);
     codeText.value = "";
 
     M.Toast.dismissAll();
@@ -163,6 +209,11 @@ function startStop(e) {
         inSession = false;
         stopBtn.innerHTML = "start";
 
+        if (newDataReceived) {
+            patchData(fbUrl, "", racerId + "/Dataset/" + sessionId, dataset);
+            console.log("Data uploaded");
+        }
+
         console.log("Stop");
     }
 }
@@ -172,9 +223,29 @@ function reset(e) {
     inSession = false;
     isUploaded = false;
     atLapStart = true;
+    newDataReceived = false;
+    isDataCompare = false;
+
+    if (isLoggedIn) {
+        setupSessionSelector();
+    }
 
     // Reset data
-    dweetDataSet = {
+    dataset = {
+        accelX: [],
+        accelY: [],
+        accelZ: [],
+        brake: [],
+        gas: [],
+        lat: [],
+        lon: [],
+        time: [],
+        vel: [],
+        wheel: [],
+        bat: [],
+    };
+
+    compareData = {
         accelX: [],
         accelY: [],
         accelZ: [],
@@ -198,16 +269,16 @@ function reset(e) {
 
     // TESTING---------------------------------------------------
     // runTestCode();
-    dweetRandomData();
+    // dweetRandomData();
 
     // Reset graphs
-    updateGraphs(dweetDataSet);
+    updateGraphs(dataset);
 
     // Reset table----------------------------------------------------------------------
-    updateTable(lapData, dweetDataSet);
+    updateTable(lapData, dataset);
 
     // Reset track
-    updateTrack(dweetDataSet);
+    updateTrack(dataset);
 
     // Generate new session id
     sessionId = "session" + new Date().getTime();
@@ -226,7 +297,7 @@ function downloadData(e) {
     let dlBtn = e.target;
     let dataStr =
         "data:text/json;charset=utf-8," +
-        encodeURIComponent(JSON.stringify(dweetDataSet));
+        encodeURIComponent(JSON.stringify(dataset));
     dlBtn.setAttribute("href", dataStr);
     dlBtn.setAttribute("download", sessionId + ".json");
 
@@ -249,9 +320,75 @@ function uploadJSON() {
     updateTrack(uploadedDataset);
     checkNewLap(uploadedDataset);
 
-    dweetDataSet = uploadedDataset;
+    dataset = uploadedDataset;
+
+    closeExtrasPanel();
 
     console.log("JSON Data Uploaded");
+}
+
+// Sets up the session selector
+async function setupSessionSelector() {
+    // Get past session data
+    let racerData = await getData(fbUrl, `/${racerId}`);
+    // Get session list area
+    let listArea = document.querySelector("#sessionList");
+    listArea.innerHTML = "";
+
+    // Check--------------------------
+    if (racerData) {
+        // Create button for each session
+        for (let i = 0; i < Object.keys(racerData.Dataset).length; i++) {
+            // Create session list
+            let sessionLi = document.createElement("li");
+
+            // Create session button
+            let sessionBtn = document.createElement("a");
+            sessionBtn.href = "#!";
+            let ms = Object.keys(racerData.Dataset)[i].slice(7);
+            let s = Math.floor(ms / 1000);
+            let m = Math.floor(s / 60);
+            s = s % 60;
+            let h = Math.floor(m / 60);
+            m = m % 60;
+            let d = Math.floor(h / 24);
+            h = h % 24;
+            d = d % 365;
+            let sessionTime = d + ":" + h + ":" + m + ":" + s;
+            sessionBtn.innerHTML =
+                Object.keys(racerData.Dataset)[i] + " - " + sessionTime;
+
+            // Create event listener for button
+            sessionBtn.addEventListener("click", function () {
+                // TESTING
+                // reset();
+
+                inSession = false;
+                isUploaded = true;
+
+                let sessionData =
+                    racerData.Dataset[Object.keys(racerData.Dataset)[i]];
+
+                isDataCompare
+                    ? (compareData = sessionData)
+                    : (dataset = sessionData);
+
+                refresh();
+
+                closeExtrasPanel();
+
+                console.log(`${Object.keys(racerData.Dataset)[i]} selected`);
+            });
+
+            // Place session buttons in list
+            sessionLi.appendChild(sessionBtn);
+            listArea.appendChild(sessionLi);
+        }
+
+        console.log(`Fetched session data for ${racerId}`);
+    } else {
+        console.log(`No session data to fetch for ${racerId}`);
+    }
 }
 
 // Shows the extras panel
@@ -296,15 +433,49 @@ function closeHelpPanel() {
 
 // Deletes all data from database
 function flushDatabase() {
-    deleteData(fbUrl, "");
+    deleteData(fbUrl, "", racerId);
 
     console.log("Flushed Database");
 }
 
 // Updates graphs
 function updateGraphs(data) {
+    // Check for empty data points
+    if (!data.vel) data.vel = [];
+    if (!data.accelY) data.accelY = [];
+    if (!data.accelX) data.accelX = [];
+    if (!data.accelZ) data.accelZ = [];
+    if (!data.gas) data.gas = [];
+    if (!data.brake) data.brake = [];
+    if (!data.wheel) data.wheel = [];
+
+    if (isDataCompare) {
+        if (!compareData.vel) compareData.vel = [];
+        if (!compareData.accelY) compareData.accelY = [];
+        if (!compareData.accelX) compareData.accelX = [];
+        if (!compareData.accelZ) compareData.accelZ = [];
+        if (!compareData.gas) compareData.gas = [];
+        if (!compareData.brake) compareData.brake = [];
+        if (!compareData.wheel) compareData.wheel = [];
+    }
+
+    // Offset initial time
+    let time = [];
+    let compareTime = [];
+    if (data.time[0]) {
+        time = [...data.time];
+        let initialTime = time[0];
+        time = time.map((t) => t - initialTime);
+    }
+    if (compareData.time[0]) {
+        compareTime = [...compareData.time];
+        let compareInitialTime = compareTime[0];
+        compareTime = compareTime.map((t) => t - compareInitialTime);
+    }
+
+    // Main data
     var velTrace = {
-        x: data.time,
+        x: time,
         y: data.vel,
         mode: "lines+markers",
         marker: {
@@ -321,7 +492,7 @@ function updateGraphs(data) {
     };
 
     var accelYTrace = {
-        x: data.time,
+        x: time,
         y: data.accelY,
         mode: "lines+markers",
         marker: {
@@ -333,12 +504,12 @@ function updateGraphs(data) {
             width: 2,
             shape: "spline",
         },
-        text: "m/s^2",
+        text: "g",
         name: "Y-Axis Acceleration",
     };
 
     var accelXTrace = {
-        x: data.time,
+        x: time,
         y: data.accelX,
         mode: "lines+markers",
         marker: {
@@ -350,12 +521,12 @@ function updateGraphs(data) {
             width: 2,
             shape: "spline",
         },
-        text: "m/s^2",
+        text: "g",
         name: "X-Axis Acceleration",
     };
 
     var accelZTrace = {
-        x: data.time,
+        x: time,
         y: data.accelZ,
         mode: "lines+markers",
         marker: {
@@ -367,12 +538,12 @@ function updateGraphs(data) {
             width: 2,
             shape: "spline",
         },
-        text: "m/s^2",
+        text: "g",
         name: "Z-Axis Acceleration",
     };
 
     var gasTrace = {
-        x: data.time,
+        x: time,
         y: data.gas,
         mode: "lines+markers",
         marker: {
@@ -384,12 +555,12 @@ function updateGraphs(data) {
             width: 2,
             shape: "spline",
         },
-        text: "cm",
+        text: "mm",
         name: "Gas Pedal",
     };
 
     var brakeTrace = {
-        x: data.time,
+        x: time,
         y: data.brake,
         mode: "lines+markers",
         marker: {
@@ -401,12 +572,12 @@ function updateGraphs(data) {
             width: 2,
             shape: "spline",
         },
-        text: "cm",
+        text: "mm",
         name: "Brake Pedal",
     };
 
     var steerTrace = {
-        x: data.time,
+        x: time,
         y: data.wheel,
         mode: "lines+markers",
         marker: {
@@ -421,6 +592,128 @@ function updateGraphs(data) {
         text: "degrees*",
         name: "Steering Wheel Rotation",
     };
+
+    // Compare data
+    if (isDataCompare) {
+        var velTrace2 = {
+            x: compareTime,
+            y: compareData.vel,
+            mode: "lines+markers",
+            marker: {
+                color: "red",
+                size: 6,
+            },
+            line: {
+                color: "red",
+                width: 2,
+                shape: "spline",
+            },
+            text: "mph",
+            name: "Velocity 2",
+        };
+
+        var accelYTrace2 = {
+            x: compareTime,
+            y: compareData.accelY,
+            mode: "lines+markers",
+            marker: {
+                color: "red",
+                size: 6,
+            },
+            line: {
+                color: "red",
+                width: 2,
+                shape: "spline",
+            },
+            text: "g",
+            name: "Y-Axis Acceleration 2",
+        };
+
+        var accelXTrace2 = {
+            x: compareTime,
+            y: compareData.accelX,
+            mode: "lines+markers",
+            marker: {
+                color: "red",
+                size: 6,
+            },
+            line: {
+                color: "red",
+                width: 2,
+                shape: "spline",
+            },
+            text: "g",
+            name: "X-Axis Acceleration 2",
+        };
+
+        var accelZTrace2 = {
+            x: compareTime,
+            y: compareData.accelZ,
+            mode: "lines+markers",
+            marker: {
+                color: "red",
+                size: 6,
+            },
+            line: {
+                color: "red",
+                width: 2,
+                shape: "spline",
+            },
+            text: "g",
+            name: "Z-Axis Acceleration 2",
+        };
+
+        var gasTrace2 = {
+            x: compareTime,
+            y: compareData.gas,
+            mode: "lines+markers",
+            marker: {
+                color: "red",
+                size: 6,
+            },
+            line: {
+                color: "red",
+                width: 2,
+                shape: "spline",
+            },
+            text: "mm",
+            name: "Gas Pedal 2",
+        };
+
+        var brakeTrace2 = {
+            x: compareTime,
+            y: compareData.brake,
+            mode: "lines+markers",
+            marker: {
+                color: "red",
+                size: 6,
+            },
+            line: {
+                color: "red",
+                width: 2,
+                shape: "spline",
+            },
+            text: "mm",
+            name: "Brake Pedal 2",
+        };
+
+        var steerTrace2 = {
+            x: compareTime,
+            y: compareData.wheel,
+            mode: "lines+markers",
+            marker: {
+                color: "red",
+                size: 6,
+            },
+            line: {
+                color: "red",
+                width: 2,
+                shape: "spline",
+            },
+            text: "degrees*",
+            name: "Steering Wheel Rotation 2",
+        };
+    }
 
     // Define graph layout
     var layout = {
@@ -483,6 +776,17 @@ function updateGraphs(data) {
     var brakeData = [brakeTrace];
     var steerData = [steerTrace];
 
+    // Add compare data if available
+    if (isDataCompare) {
+        velData.push(velTrace2);
+        accelYData.push(accelYTrace2);
+        accelXData.push(accelXTrace2);
+        accelZData.push(accelZTrace2);
+        gasData.push(gasTrace2);
+        brakeData.push(brakeTrace2);
+        steerData.push(steerTrace2);
+    }
+
     // Plot data on graphs
     Plotly.newPlot("velocityGraph", velData, layout, { responsive: true });
     Plotly.newPlot("accelYGraph", accelYData, layout, { responsive: true });
@@ -494,7 +798,13 @@ function updateGraphs(data) {
 
     // TESTING
     let batBar = document.querySelector("#batteryBar");
-    let batPercentage = dweetDataSet.bat[dweetDataSet.bat.length - 1];
+    // Check if battery value exists
+    let batPercentage;
+    try {
+        batPercentage = dataset.bat[dataset.bat.length - 1];
+    } catch {
+        batPercentage = 160000;
+    }
     batPercentage = ((batPercentage - 160000) / (185000 - 160000)) * 100;
     batBar.style.height = "40px";
     batBar.style.width = `${batPercentage}%`;
@@ -518,11 +828,11 @@ function updateTrack(data) {
     exLonMax = Math.max(...exLon);
 
     exLat = exLat.map((x) => (x = (x / exLatMax) * 90 + 5));
-    exLon = exLon.map((x) => (x = (x / exLonMax) * 80 + 5));
+    exLon = exLon.map((x) => (x = (x / exLonMax) * 70 + 5));
 
     color = "";
     for (let i = 0; i < exLat.length; i++) {
-        var newPoint = document.createElement("div");
+        let newPoint = document.createElement("div");
         newPoint.className = "track";
 
         // Set velocity color
@@ -557,8 +867,47 @@ function updateTrack(data) {
         }
 
         newPoint.style.backgroundColor = color;
-        newPoint.style.left = exLat[i] + "%";
+        newPoint.style.right = exLat[i] + "%";
         newPoint.style.bottom = exLon[i] + "%";
+
+        // Points hover event listeners
+        newPoint.addEventListener("mouseover", function () {
+            let hoverArea = document.querySelector("#trackHoverArea");
+            let time = data.time[i];
+            let velocity = data.vel[i];
+            let accelY = data.accelY[i];
+            let accelX = data.accelX[i];
+            let gas = data.gas[i];
+            let brake = data.brake[i];
+            let wheel = data.wheel[i];
+            let lat = data.lat[i];
+            let lon = data.lon[i];
+
+            // Print point data
+            let hoverText = `Time: ${parseFloat(time - data.time[0]).toFixed(
+                3
+            )} s<br>`;
+            hoverText += `Velocity: ${parseFloat(velocity).toFixed(3)} mph<br>`;
+            hoverText += `Y Accel: ${parseFloat(accelY).toFixed(3)} g<br>`;
+            hoverText += `X Accel: ${parseFloat(accelX).toFixed(3)} g<br>`;
+            hoverText += `Gas Pedal: ${parseFloat(gas).toFixed(3)} mm<br>`;
+            hoverText += `Brake Pedal: ${parseFloat(brake).toFixed(3)} mm<br>`;
+            hoverText += `Steering Wheel: ${parseFloat(wheel).toFixed(
+                3
+            )} degrees<br>`;
+            hoverText += `Position: ${parseFloat(lat)} and ${parseFloat(
+                lon
+            )}<br>`;
+            hoverArea.innerHTML = hoverText;
+            hoverArea.style.visibility = "visible";
+        });
+        newPoint.addEventListener("mouseout", function () {
+            let hoverArea = document.querySelector("#trackHoverArea");
+            hoverArea.style.visibility = "hidden";
+            document.querySelector("#trackHoverArea").innerHTML = "";
+        });
+
+        // Place point on track
         document.querySelector("#mapArea").append(newPoint);
     }
 
@@ -576,19 +925,22 @@ function updateTrack(data) {
         customPoint.style.height = "2vw";
         customPoint.style.width = "auto";
         customPoint.style.zIndex = "999999";
+        customPoint.style.top = "-350%";
 
         // Apply new finish line point
         customPoint.src = "trackFinish.png";
-        customPoint.style.left = firstPoint.style.left;
-        customPoint.style.bottom = firstPoint.style.bottom;
-        firstPoint.parentNode.replaceChild(customPoint, firstPoint);
+        // customPoint.style.left = firstPoint.style.left;
+        // customPoint.style.bottom = firstPoint.style.bottom;
+        // firstPoint.parentNode.replaceChild(customPoint, firstPoint);
+        firstPoint.appendChild(customPoint);
 
         // Apply new current position point
         customPoint2 = customPoint.cloneNode();
         customPoint2.src = "trackLatest.png";
-        customPoint2.style.left = lastPoint.style.left;
-        customPoint2.style.bottom = lastPoint.style.bottom;
-        lastPoint.parentNode.replaceChild(customPoint2, lastPoint);
+        // customPoint2.style.left = lastPoint.style.left;
+        // customPoint2.style.bottom = lastPoint.style.bottom;
+        // lastPoint.parentNode.replaceChild(customPoint2, lastPoint);
+        lastPoint.appendChild(customPoint2);
     }
 }
 
@@ -665,11 +1017,11 @@ function updateTable(lapData, data) {
         rowData[i - 1] = {
             lapNumber: i,
             lapTime: lapTime,
-            ls1: subsection1.toFixed(3),
-            ls2: (subsection2 - section1).toFixed(3),
-            ls3: (subsection3 - section2).toFixed(3),
-            ls4: (subsection4 - section3).toFixed(3),
-            ls5: (subsection5 - section4).toFixed(3),
+            ls1: subsection1.toFixed(9),
+            ls2: (subsection2 - section1).toFixed(9),
+            ls3: (subsection3 - section2).toFixed(9),
+            ls4: (subsection4 - section3).toFixed(9),
+            ls5: (subsection5 - section4).toFixed(9),
         };
 
         // lapOffset = ;
@@ -738,21 +1090,21 @@ function checkNewLap(data) {
             data.lon[i]
         );
 
-        let startAreaRadius = 2;
+        let startAreaRadius = 6;
         // TESTING
         // startAreaRadius = 5000;
 
         // Check if leaving starting zone
         if (distance > startAreaRadius && atLapStart) {
             atLapStart = false;
-            console.log("Left Starting Area . . .");
+            // console.log("Left Starting Area . . .");
         }
 
         // Check if entering starting zone
         if (distance < startAreaRadius && !atLapStart) {
             atLapStart = true;
             isNewLap = true;
-            console.log("Re-Entered Starting Area . . .");
+            // console.log("Re-Entered Starting Area . . .");
         }
 
         // Check if new lap
@@ -762,19 +1114,19 @@ function checkNewLap(data) {
             lapData.lapNum += 1;
             isNewLap = false;
 
-            console.log(
-                "New Lap at",
-                i,
-                "of",
-                newLat,
-                "and",
-                newLon,
-                "with",
-                data.lat[0],
-                "and",
-                data.lon[0],
-                distance
-            );
+            // console.log(
+            //     "New Lap at",
+            //     i,
+            //     "of",
+            //     newLat,
+            //     "and",
+            //     newLon,
+            //     "with",
+            //     data.lat[0],
+            //     "and",
+            //     data.lon[0],
+            //     distance
+            // );
         }
     }
 
@@ -796,94 +1148,99 @@ function checkNewLap(data) {
     return isNewLap;
 }
 
+// TESTING
 // Calculate the velocity from Lat and Lon points
-function calcVel() {
-    let velocity =
-        getDistance(dweetDataSet) /
-        (dweetDataSet.time[dweetDataSet.time.length - 2] -
-            dweetDataSet.time[dweetDataSet.time.length - 1]);
+// function calcVel() {
+//     let velocity =
+//         getDistance(dataset) /
+//         (dataset.time[dataset.time.length - 2] -
+//             dataset.time[dataset.time.length - 1]);
 
-    // Check if velocity is calculable (starting velocity value)
-    if (!velocity) {
-        velocity = 0;
-    }
-    return velocity;
-}
+//     // Check if velocity is calculable (starting velocity value)
+//     if (!velocity) {
+//         velocity = 0;
+//     }
+//     return velocity;
+// }
 
+// TESTING
 // Calculates the distance from Lon and Lat data points in a dataset
-function getDistance2(coords) {
-    var degToRad = Math.PI / 180;
+// function getDistance2(coords) {
+//     var degToRad = Math.PI / 180;
 
-    let distance =
-        6371000 *
-        degToRad *
-        Math.sqrt(
-            Math.pow(
-                Math.cos(coords.lat[coords.lat.length - 2] * degToRad) *
-                    (coords.lon[coords.lon.length - 2] -
-                        coords.lon[coords.lon.length - 1]),
-                2
-            ) +
-                Math.pow(
-                    coords.lat[coords.lat.length - 2] -
-                        coords.lat[coords.lat.length - 1],
-                    2
-                )
-        );
-    return distance;
-}
+//     let distance =
+//         6371000 *
+//         degToRad *
+//         Math.sqrt(
+//             Math.pow(
+//                 Math.cos(coords.lat[coords.lat.length - 2] * degToRad) *
+//                     (coords.lon[coords.lon.length - 2] -
+//                         coords.lon[coords.lon.length - 1]),
+//                 2
+//             ) +
+//                 Math.pow(
+//                     coords.lat[coords.lat.length - 2] -
+//                         coords.lat[coords.lat.length - 1],
+//                     2
+//                 )
+//         );
+//     return distance;
+// }
 
+// TESTING
 // Gets data from latest dweet and updates current dataset
-function extractDweet(dweet) {
-    // Add dweet content to dataset if not a repeat
-    if (jQuery.isEmptyObject(dweet)) {
-        console.log("No Data Received");
-        return false;
-    } else if (!dweetDataSet.time.includes(Object.keys(dweet)[0] / 1000)) {
-        for (var prop in dweet) {
-            let propData = dweet[prop].split(",");
+// function extractDweet(dweet) {
+//     // Add dweet content to dataset if not a repeat
+//     if (jQuery.isEmptyObject(dweet)) {
+//         console.log("No Data Received");
+//         return false;
+//     } else if (!dataset.time.includes(Object.keys(dweet)[0] / 1000)) {
+//         for (var prop in dweet) {
+//             let propData = dweet[prop].split(",");
 
-            // Check if new lap
-            // newLap(propData);
+//             // Check if new lap
+//             // newLap(propData);
 
-            // store dataset values
-            dweetDataSet.wheel.push(propData[0]);
-            dweetDataSet.gas.push(propData[1]);
-            dweetDataSet.brake.push(propData[2]);
-            dweetDataSet.accelX.push(propData[3]);
-            dweetDataSet.accelY.push(propData[4]);
-            dweetDataSet.accelZ.push(propData[5]);
-            dweetDataSet.lat.push(propData[6]);
-            dweetDataSet.lon.push(propData[7]);
-            dweetDataSet.vel.push((propData[8] / 1000) * 2.237);
-            dweetDataSet.time.push(prop / 1000);
+//             // store dataset values
+//             dataset.wheel.push(propData[0]);
+//             dataset.gas.push(propData[1]);
+//             dataset.brake.push(propData[2]);
+//             dataset.accelX.push(propData[3]);
+//             dataset.accelY.push(propData[4]);
+//             dataset.accelZ.push(propData[5]);
+//             dataset.lat.push(propData[6]);
+//             dataset.lon.push(propData[7]);
+//             dataset.vel.push((propData[8] / 1000) * 2.237);
+//             dataset.time.push(prop / 1000);
 
-            // calc and store velocity
-            // let velocity = calcVel();
-            // dweetDataSet.vel.push(velocity.toFixed(2));
-        }
+//             // calc and store velocity
+//             // let velocity = calcVel();
+//             // dataset.vel.push(velocity.toFixed(2));
+//         }
 
-        patchData(fbUrl, "", racerId + "/Dataset/" + sessionId, dweetDataSet);
+//         patchData(fbUrl, "", racerId + "/Dataset/" + sessionId, dataset);
 
-        console.log("New Data Received");
-        return true;
-    } else {
-        console.log("Repeat Data Received");
-        return false;
-    }
-}
+//         console.log("New Data Received");
+//         return true;
+//     } else {
+//         console.log("Repeat Data Received");
+//         return false;
+//     }
+// }
 
+// TESTING
 // Gets latest dweet content
-async function getDweet(url = "") {
-    const response = await fetch(url);
-    return response.json();
-}
+// async function getDweet(url = "") {
+//     const response = await fetch(url);
+//     return response.json();
+// }
 
+// TESTING
 // Posts data to dweet
-async function postDweet(url = "", postData = "") {
-    const response = await fetch(url + postData);
-    return response.json();
-}
+// async function postDweet(url = "", postData = "") {
+//     const response = await fetch(url + postData);
+//     return response.json();
+// }
 
 // Gets data from database
 async function getData(url, item) {
@@ -910,5 +1267,5 @@ async function deleteData(url, item = "", name = "") {
 
 // Run on window resize
 function windowResize() {
-    updateTable(lapData, dweetDataSet);
+    updateTable(lapData, dataset);
 }
