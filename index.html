@@ -13,7 +13,6 @@
         />
         <!-- JS -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
         <script src="https://unpkg.com/@ag-grid-community/all-modules@25.0.0/dist/ag-grid-community.min.js"></script>
 
@@ -33,18 +32,6 @@
         <script type="text/javascript" src="js/materialize.min.js"></script>
         <script src="js/variables.js"></script>
         <script src="js/testFunctions.js"></script>
-
-        <!-- Mapkick -->
-        <link
-            href="https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.css"
-            rel="stylesheet"
-        />
-        <script src="https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js"></script>
-        <script>
-            mapboxgl.accessToken =
-                "pk.eyJ1IjoiYmlnZ2llOTU5OCIsImEiOiJja25iMXZha20wajU4MnptaWsxdGp0ZTBwIn0.MsG2XMdeaIOLTAFKjt4FaA";
-        </script>
-        <script src="js/mapkick.js"></script>
     </head>
 
     <body class="grid">
@@ -157,18 +144,20 @@
                 <!-- left side -->
                 <div class="col s6">
                     <!-- Battery Level -->
-                    <!-- TESTING battery visibility: hidden -->
-                    <div class="row" style="visibility: hidden">
+                    <div class="row">
                         <div class="col s12">
                             <b>BATTERY LEVEL</b>
                             <div class="row"></div>
-                            <div class="col s12 blue-grey" style="padding: 5px">
+                            <div
+                                class="col s12 blue-grey"
+                                style="padding: 5px; overflow: hidden"
+                            >
                                 <div
                                     class="blue-grey lighten-4 blue-grey-text text-darken-4 valign-wrapper"
                                     id="batteryBar"
                                     style="padding-left: 10px"
                                 >
-                                    <b>asdf</b>
+                                    <b></b>
                                 </div>
                             </div>
                         </div>
@@ -182,12 +171,6 @@
                             <b>Z-AXIS ACCELERATION</b>
                         </div>
                     </div>
-                    <!-- Mapkick -->
-                    <div class="row">
-                        <div class="col s12">
-                            <div id="map" style="height: 400px"></div>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- right side -->
@@ -196,7 +179,11 @@
                     <blockquote>
                         <h5 class="left-align">Settings</h5>
                         <hr />
-                        <div class="row"></div>
+                        <div class="col s12">
+                            <p id="racerLabel">
+                                <b>Racer ID:</b> default_racer
+                            </p>
+                        </div>
                         <div class="row">
                             <!-- Logout Button -->
                             <div class="col s12">
@@ -232,7 +219,7 @@
                                 <a
                                     class="btn grey darken-4 customBtn"
                                     id="flushBtn"
-                                    >flush database</a
+                                    >delete all user data</a
                                 >
                             </div>
                         </div>
@@ -344,6 +331,11 @@
                                 position, brake pedal position, and steering
                                 wheel rotation.
                             </p>
+                            <p>
+                                When comparing two sessions, the
+                                <b class="cyan-text">cyan</b> lines indicate the
+                                compare data.
+                            </p>
                         </blockquote>
                     </div>
 
@@ -369,7 +361,8 @@
                             <h5>Extras Panel</h5>
                             <hr />
                             <p>
-                                This panel shows the z-axis acceleration graph.
+                                This panel shows the battery level, as well as
+                                the z-axis acceleration graph.
                             </p>
                             <div class="btn blue-grey">logout</div>
                             <div class="btn red lighten-1">change code</div>
@@ -377,7 +370,9 @@
                                 This panel also allows you to logout, or change
                                 the access code.
                             </p>
-                            <div class="btn grey darken-4">flush database</div>
+                            <div class="btn grey darken-4">
+                                delete all user data
+                            </div>
                             <p>
                                 This button erases the database for the current
                                 user, including all previous sessions.
@@ -394,7 +389,10 @@
                             <div class="btn teal">choose a session</div>
                             <p>
                                 This button lets you load a past session from
-                                the database.
+                                the database. The toggle below it is used to
+                                compare two different sessions. Simply choose
+                                the base session, toggle the compare switch,
+                                then select another session to compare.
                             </p>
                         </blockquote>
                     </div>
@@ -478,7 +476,9 @@
                                 speed bracket at that location, with
                                 <b class="red-text">red</b> being the slowest,
                                 and <b class="green-text">green</b> being the
-                                fastest.
+                                fastest. When comparing two sessions, the
+                                <b class="cyan-text">cyan</b> points indicate
+                                the compare track.
                             </p>
                         </blockquote>
                     </div>

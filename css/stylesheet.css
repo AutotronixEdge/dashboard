@@ -134,14 +134,14 @@ body {
     position: relative;
     margin: 10px !important;
     overflow: hidden;
-    height: 60%;
+    /* height: 15vw; */
+    background-color: red;
 }
 
 .track {
-    /* background-color: cyan; */
-    width: 0.5vw;
-    height: 0.5vw;
-    border-radius: 0.5vw;
+    width: 5px;
+    height: 5px;
+    border-radius: 2.5px;
     position: absolute;
 }
 
