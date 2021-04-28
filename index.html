@@ -2,77 +2,539 @@
 <html>
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Autotronix Dashboard</title>
 
-        <!-- Local Files -->
-        <link rel="icon" href="autotronixLogoLetter.png" />
-        <link rel="stylesheet" href="stylesheet.css" />
-        <script src="main.js"></script>
-        <script src="variables.js"></script>
-
-        <!-- Online JS -->
+        <!-- Online Files -->
+        <!-- CSS -->
+        <link
+            href="https://fonts.googleapis.com/icon?family=Material+Icons"
+            rel="stylesheet"
+        />
+        <!-- JS -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-        <!-- Graphing -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-
-        <!-- Tables -->
         <script src="https://unpkg.com/@ag-grid-community/all-modules@25.0.0/dist/ag-grid-community.min.js"></script>
+
+        <!-- Local Files -->
+        <!-- Media -->
+        <link rel="icon" href="autotronixLogoLetter.png" />
+        <!-- CSS -->
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="css/materialize.min.css"
+            media="screen,projection"
+        />
+        <link rel="stylesheet" href="css/stylesheet.css" />
+        <!-- JS -->
+        <script src="js/main.js"></script>
+        <script type="text/javascript" src="js/materialize.min.js"></script>
+        <script src="js/variables.js"></script>
+        <script src="js/testFunctions.js"></script>
     </head>
 
     <body class="grid">
         <!-- Graphs -->
         <div class="gasGraph">
-            <div id="gasGraph">Gas</div>
+            <div id="gasGraph"><b>GAS</b></div>
         </div>
         <div class="brakeGraph">
-            <div id="brakeGraph">Braking</div>
+            <div id="brakeGraph"><b>BRAKING</b></div>
         </div>
         <div class="accelXGraph">
-            <div id="accelXGraph">X-axis Acceleration</div>
+            <div id="accelXGraph"><b>X-AXIS ACCELERATION</b></div>
         </div>
         <div class="steeringGraph">
-            <div id="steeringGraph">Steering Wheel Rotation</div>
+            <div id="steeringGraph"><b>STEERING WHEEL ROTATION</b></div>
         </div>
         <div class="accelYGraph">
-            <div id="accelYGraph">Y-axis Acceleration</div>
+            <div id="accelYGraph"><b>Y-AXIS ACCELERATION</b></div>
         </div>
         <div class="velocityGraph">
-            <div id="velocityGraph">Velocity</div>
+            <div id="velocityGraph"><b>VELOCITY</b></div>
         </div>
 
         <!-- Lap Time Table -->
         <div class="laps">
             <div id="myGrid" class="ag-theme-alpine-dark"></div>
         </div>
-        <div class="lapTimes">
-            <p id="lapTimes"></p>
+        <div class="lapTimes row">
+            <div class="card-panel blue-grey darken-4">
+                <b>LAP STATISTICS</b>
+                <p id="lapTimes"></p>
+            </div>
         </div>
 
         <!-- Buttons -->
         <div class="buttons">
-            <input
-                id="startStopButton"
-                type="button"
-                value="Start / Stop"
-                onclick="startStopGraph()"
-            />
-            <input
-                id="resetButton"
-                type="button"
-                value="Reset"
-                onclick="resetGraph()"
-            />
+            <div class="row">
+                <!-- Start / Stop Button -->
+                <div class="col s6">
+                    <a
+                        id="startStopBtn"
+                        class="btn waves-effect waves-light green darken-4 col s12"
+                        >start</a
+                    >
+                </div>
+
+                <!-- Reset Button -->
+                <div class="col s6">
+                    <a
+                        id="resetBtn"
+                        class="btn waves-effect waves-light red darken-4 col s12"
+                        ><i class="material-icons right">restart_alt</i>reset</a
+                    >
+                </div>
+
+                <div class="row"></div>
+
+                <!-- Extras Button -->
+                <div class="col s6">
+                    <a
+                        class="btn waves-effect waves-light purple darken-4 col s12"
+                        id="extrasBtn"
+                    >
+                        <i class="material-icons right">settings</i>extras</a
+                    >
+                </div>
+
+                <!-- Help Button -->
+                <div class="col s6">
+                    <a
+                        class="btn waves-effect waves-light brown col s12"
+                        id="helpBtn"
+                        ><i class="material-icons right">help_outline</i>help</a
+                    >
+                </div>
+            </div>
         </div>
 
         <!-- Track -->
-        <div class="map">
-            <div id="testMap">
-                <div id="map"></div>
-            </div>
+        <div class="map card-panel blue-grey darken-4">
+            <b>TRACK</b>
+            <div id="mapArea"></div>
+        </div>
+
+        <!-- Misc -->
+        <div class="misc valign-wrapper">
+            <!-- Logo -->
             <img id="logo" src="autotronixLogoOpaque.png" />
+
+            <!-- Track Hover Area -->
+            <div
+                id="trackHoverArea"
+                class="card-panel blue-grey darken-2"
+            ></div>
+        </div>
+
+        <!-- Extras Panel -->
+        <div id="extrasPanel">
+            <!-- Title -->
+            <div class="row">
+                <div class="row"></div>
+                <div class="col s12">
+                    <b>EXTRAS PANEL</b>
+                    <a class="btn blue-grey darken-2 right" id="closeExtrasBtn"
+                        ><i class="material-icons">close</i></a
+                    >
+                </div>
+            </div>
+            <div class="row">
+                <!-- left side -->
+                <div class="col s6">
+                    <!-- Battery Level -->
+                    <div class="row">
+                        <div class="col s12">
+                            <b>BATTERY LEVEL</b>
+                            <div class="row"></div>
+                            <div
+                                class="col s12 blue-grey"
+                                style="padding: 5px; overflow: hidden"
+                            >
+                                <div
+                                    class="blue-grey lighten-4 blue-grey-text text-darken-4 valign-wrapper"
+                                    id="batteryBar"
+                                    style="padding-left: 10px"
+                                >
+                                    <b></b>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row"></div>
+
+                    <!-- Graph -->
+                    <div class="row">
+                        <div class="col s11 graphCol" id="accelZGraph">
+                            <b>Z-AXIS ACCELERATION</b>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- right side -->
+                <div class="col s6">
+                    <!-- Settings -->
+                    <blockquote>
+                        <h5 class="left-align">Settings</h5>
+                        <hr />
+                        <div class="col s12">
+                            <p id="racerLabel">
+                                <b>Racer ID:</b> default_racer
+                            </p>
+                        </div>
+                        <div class="row">
+                            <!-- Logout Button -->
+                            <div class="col s12">
+                                <a class="btn blue-grey col s12" id="logoutBtn"
+                                    ><i class="material-icons right">logout</i
+                                    >logout</a
+                                >
+                            </div>
+
+                            <div class="row"></div>
+
+                            <!-- Change Access Code -->
+                            <div class="col s8 input-field">
+                                <i class="material-icons prefix">lock</i>
+                                <input
+                                    placeholder="New Access Code"
+                                    id="new_access_code"
+                                    type="password"
+                                    class="white-text"
+                                />
+                            </div>
+                            <div class="col s4 input-field">
+                                <a
+                                    class="btn red lighten-1 col s12"
+                                    id="newCodeBtn"
+                                    ><i class="material-icons right">vpn_key</i
+                                    >change code</a
+                                >
+                            </div>
+
+                            <!-- Flush Database -->
+                            <div class="col s12">
+                                <a
+                                    class="btn grey darken-4 customBtn"
+                                    id="flushBtn"
+                                    >delete all user data</a
+                                >
+                            </div>
+                        </div>
+                    </blockquote>
+
+                    <!-- Download / Upload JSON -->
+                    <blockquote>
+                        <h5 class="left-align">Download / Upload Session</h5>
+                        <hr />
+                        <div class="row"></div>
+                        <div class="row">
+                            <!-- Download Button -->
+                            <div class="col s12">
+                                <a
+                                    class="btn blue darken-4 col s12"
+                                    id="downloadBtn"
+                                    ><i class="material-icons right">download</i
+                                    >download currrent session</a
+                                >
+                            </div>
+                            <div class="row"></div>
+
+                            <!-- Upload JSON -->
+                            <div class="col s8 input-field">
+                                <i class="material-icons prefix"
+                                    >text_snippet</i
+                                >
+                                <input
+                                    placeholder="JSON Text"
+                                    id="jsonText"
+                                    class="white-text"
+                                />
+                            </div>
+                            <div class="col s4 input-field">
+                                <a class="btn blue col s12" id="uploadBtn"
+                                    ><i class="material-icons right">upload</i
+                                    >Upload</a
+                                >
+                            </div>
+                        </div>
+                    </blockquote>
+
+                    <!-- Select Session -->
+                    <blockquote>
+                        <h5 class="left-align">Session Selector</h5>
+                        <hr />
+                        <div class="row"></div>
+                        <div class="row">
+                            <!-- Download Button -->
+                            <div class="col s12">
+                                <a
+                                    class="btn dropdown-trigger teal col s12"
+                                    href="#"
+                                    data-target="sessionList"
+                                    id="selectSessionBtn"
+                                    ><i class="material-icons right"
+                                        >arrow_drop_down</i
+                                    >choose a session</a
+                                >
+                                <ul
+                                    id="sessionList"
+                                    class="dropdown-content"
+                                ></ul>
+                            </div>
+
+                            <div class="row"></div>
+
+                            <!-- Compare Toggle -->
+                            <div class="switch">
+                                <label
+                                    >Don't Compare<input
+                                        type="checkbox"
+                                        id="compToggle"
+                                    />
+                                    <span class="lever"></span>Compare</label
+                                >
+                            </div>
+                        </div>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Panel -->
+        <div id="helpPanel">
+            <!-- Title -->
+            <div class="row">
+                <div class="row"></div>
+                <div class="col s12">
+                    <b>HELP PANEL</b>
+                    <a class="btn blue-grey darken-2 right" id="closeHelpBtn"
+                        ><i class="material-icons">close</i></a
+                    >
+                </div>
+            </div>
+            <!-- Help Content -->
+            <div class="row helpText">
+                <!-- Left Side -->
+                <div class="col m12 l6">
+                    <!-- Graphs -->
+                    <div class="col s12">
+                        <blockquote>
+                            <h5>Graphs</h5>
+                            <hr />
+                            <p>
+                                This section shows graphs of the 6 main
+                                statistics including vehicle velocity, y-axis
+                                acceleration, x-axis acceleration, gas pedal
+                                position, brake pedal position, and steering
+                                wheel rotation.
+                            </p>
+                            <p>
+                                When comparing two sessions, the
+                                <b class="cyan-text">cyan</b> lines indicate the
+                                compare data.
+                            </p>
+                        </blockquote>
+                    </div>
+
+                    <!-- Lap Table -->
+                    <div class="col s12">
+                        <blockquote>
+                            <h5>Lap Table</h5>
+                            <hr />
+                            <p>
+                                This section shows the overall lap times,
+                                section times, and some general lap statistics.
+                            </p>
+                            <p>
+                                The lap is broken up into 5 sections to give
+                                further insight into certain parts of the track.
+                            </p>
+                        </blockquote>
+                    </div>
+
+                    <!-- Extras Panel -->
+                    <div class="col s12">
+                        <blockquote>
+                            <h5>Extras Panel</h5>
+                            <hr />
+                            <p>
+                                This panel shows the battery level, as well as
+                                the z-axis acceleration graph.
+                            </p>
+                            <div class="btn blue-grey">logout</div>
+                            <div class="btn red lighten-1">change code</div>
+                            <p>
+                                This panel also allows you to logout, or change
+                                the access code.
+                            </p>
+                            <div class="btn grey darken-4">
+                                delete all user data
+                            </div>
+                            <p>
+                                This button erases the database for the current
+                                user, including all previous sessions.
+                            </p>
+                            <div class="btn blue darken-4">
+                                download current session
+                            </div>
+                            <div class="btn blue">upload</div>
+                            <p>
+                                These buttons allow you to download the current
+                                working dataset as a JSON file, and upload JSON
+                                content to be displayed.
+                            </p>
+                            <div class="btn teal">choose a session</div>
+                            <p>
+                                This button lets you load a past session from
+                                the database. The toggle below it is used to
+                                compare two different sessions. Simply choose
+                                the base session, toggle the compare switch,
+                                then select another session to compare.
+                            </p>
+                        </blockquote>
+                    </div>
+                </div>
+
+                <!-- Right Side -->
+                <div class="col m12 l6">
+                    <!-- Login -->
+                    <div class="col s12">
+                        <blockquote>
+                            <h5>Login</h5>
+                            <hr />
+                            <p>
+                                The Racer ID is what is determines how the
+                                session data is stored in the database.
+                            </p>
+                            <p>
+                                The Access Code is the same for all users, but
+                                can be changed in the extras panel.
+                            </p>
+                        </blockquote>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="col s12">
+                        <blockquote>
+                            <h5>Buttons</h5>
+                            <hr />
+                            <div class="btn green darken-4">start</div>
+                            <div class="btn orange darken-4">stop</div>
+                            <p>
+                                This button starts and stops the current
+                                session.
+                            </p>
+                            <div class="btn red darken-4">reset</div>
+                            <p>
+                                This button resets the graphs, table, and track,
+                                then gets the system ready to start a new
+                                session.
+                            </p>
+                            <div class="btn purple darken-4">extras</div>
+                            <p>
+                                This buttons shows the extras panel where
+                                miscellaneous graphs and information can be
+                                shown.
+                            </p>
+                        </blockquote>
+                    </div>
+
+                    <!-- Track -->
+                    <div class="col s12">
+                        <blockquote>
+                            <h5>Track</h5>
+                            <hr />
+                            <p>
+                                This section plots the GPS position history.
+                                Hovering over a point will display a panel in
+                                the bottom right section of the page with the
+                                statistics at that point.
+                            </p>
+                            <p>
+                                The
+                                <img
+                                    src="trackFinish.png"
+                                    style="width: 30px"
+                                />
+                                point indicates the starting position on the
+                                track.
+                            </p>
+                            <p>
+                                The
+                                <img
+                                    src="trackLatest.png"
+                                    style="width: 30px"
+                                />
+                                point indicates the latest position on the
+                                track.
+                            </p>
+                            <p>
+                                The color of the remaining points indicates the
+                                speed bracket at that location, with
+                                <b class="red-text">red</b> being the slowest,
+                                and <b class="green-text">green</b> being the
+                                fastest. When comparing two sessions, the
+                                <b class="cyan-text">cyan</b> points indicate
+                                the compare track.
+                            </p>
+                        </blockquote>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login Panel -->
+        <div class="valign-wrapper" id="loginPanel">
+            <div class="row">
+                <div class="col s12 card-panel blue-grey darken-2 hoverable">
+                    <!-- Logo -->
+                    <div class="row"></div>
+                    <div class="center-align">
+                        <img class="loginLogo" src="autotronixLogoOpaque.png" />
+                    </div>
+
+                    <!-- Login Forms -->
+                    <div class="row">
+                        <!-- Racer ID -->
+                        <div class="col s12 input-field">
+                            <i class="material-icons prefix">directions_car</i>
+                            <input
+                                placeholder="Racer ID"
+                                id="racer_id"
+                                type="text"
+                                class="white-text"
+                            />
+                        </div>
+
+                        <!-- Access Code -->
+                        <div class="col s12 input-field">
+                            <i class="material-icons prefix">lock</i>
+                            <input
+                                placeholder="Access Code"
+                                id="access_code"
+                                type="password"
+                                class="white-text"
+                            />
+                        </div>
+
+                        <!-- Submit Login Button -->
+                        <div class="col s12">
+                            <button
+                                id="loginBtn"
+                                class="btn blue-grey col s12"
+                                type="submit"
+                                name="action"
+                            >
+                                <i class="material-icons right">login</i>
+                                login
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Startup Script -->

@@ -24,7 +24,8 @@ body {
     height: 100vh;
     padding: 0px;
     margin: 0px;
-    user-select: none;
+    /* user-select: none; */
+    overflow: hidden;
 }
 
 .grid {
@@ -35,7 +36,8 @@ body {
         "velocity velocity gas gas buttons"
         "accelY accelY brake brake map"
         "accelX accelX steering steering map"
-        "laps laps laps lapTimes map";
+        "laps laps laps lapTimes misc";
+
     text-align: center;
 }
 
@@ -47,6 +49,7 @@ body {
 
 #gasGraph {
     height: 100%;
+    /* height: 200px; */
 }
 
 /* ~~ Brake Graph ~~ */
@@ -118,54 +121,34 @@ body {
 .buttons {
     grid-area: buttons;
     padding-top: var(--spacing);
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: space-evenly;
+    user-select: none;
 }
 
-#startStopButton {
-    width: 45%;
-    height: 50px;
-    border-radius: var(--cornerRadius);
-    border-width: calc(var(--cornerRadius) / 2);
-    border-color: var(--primColor);
-    background-color: var(--quatColor);
-    color: var(--textColor);
-    font-size: 15pt;
-}
-
-#resetButton {
-    width: 45%;
-    height: 50px;
-    border-radius: var(--cornerRadius);
-    border-width: calc(var(--cornerRadius) / 2);
-    border-color: var(--primColor);
-    background-color: var(--tertColor);
-    color: var(--textColor);
-    font-size: 15pt;
+.customBtn {
+    width: 100%;
 }
 
 /* ~~ Track ~~ */
 .map {
     grid-area: map;
     position: relative;
-}
-
-#map {
-}
-
-#testmap {
-    /* width: 100%;
-    height: 100%; */
+    margin: 10px !important;
+    overflow: hidden;
+    /* height: 15vw; */
+    background-color: red;
 }
 
 .track {
-    background-color: cyan;
-    width: 0.5vw;
-    height: 0.5vw;
-    border-radius: 0.5vw;
+    width: 5px;
+    height: 5px;
+    border-radius: 2.5px;
     position: absolute;
+}
+
+/* Misc */
+.misc {
+    grid-area: misc;
+    position: relative;
 }
 
 #logo {
@@ -175,11 +158,69 @@ body {
     right: 25%;
 }
 
-/* ~~ Extra ~~ */
-input,
-textarea,
-button {
-    outline: none;
+#trackHoverArea {
+    visibility: hidden;
+    /* width: 90%;
+    height: 90%; */
+    /* position: absolute; */
+    z-index: 999;
+    margin: auto;
+    /* right: 0px;
+    bottom: 0px; */
+}
+
+/* Extras Panel */
+#extrasPanel {
+    position: absolute;
+    visibility: hidden;
+    background-color: rgba(38, 50, 56, 0.95);
+    width: 75vw;
+    height: 100vh;
+    /* overflow: scroll; */
+    left: 100vw;
+}
+
+.graphCol {
+    height: 30vh;
+    padding: none;
+}
+
+/* Help Panel */
+#helpPanel {
+    position: absolute;
+    visibility: hidden;
+    background-color: rgba(38, 50, 56, 0.95);
+    width: 75vw;
+    height: 100vh;
+    overflow: scroll;
+    left: 100vw;
+}
+
+.helpText {
+    text-align: left;
+}
+
+/* Login Panel */
+#loginPanel {
+    position: absolute;
+    visibility: visible;
+
+    /* TESTING */
+    /* visibility: hidden; */
+
+    background-color: rgba(38, 50, 56, 0.95);
+    width: 100vw;
+    height: 100vh;
+    z-index: 999;
+}
+
+.loginLogo {
+    width: 250px !important;
+}
+
+/* Other */
+p {
+    text-align: left;
 }
 
 /* ~~ Resize for Mobile ~~ */
@@ -187,7 +228,7 @@ button {
     .grid {
         display: grid;
         grid-template-columns: 100%;
-        grid-template-rows: 25% 75% 50% 50% 50% 50% 50% 50% 25% 100%;
+        grid-template-rows: auto 50% 50% 50% 50% 50% 50% 50% auto 100%;
         grid-template-areas:
             "buttons"
             "map"
@@ -321,9 +362,6 @@ button {
     .map {
         grid-area: map;
         font-size: 10vw; /* temporary font */
-    }
-
-    #map {
     }
 
     #logo {
